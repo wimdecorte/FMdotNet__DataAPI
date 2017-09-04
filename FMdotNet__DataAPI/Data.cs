@@ -2,9 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters;
-using System.Linq;
-using System.ServiceModel;
+using System;
 
 namespace FMdotNet__DataAPI
 {
@@ -186,7 +184,7 @@ namespace FMdotNet__DataAPI
     /// Represents a found set of records, could be the found set or its related records
     /// </summary>
     [Serializable]
-    public class FMRecordSet : ISerializable
+    public class FMRecordSet
     {
         /// <summary>
         /// The name of the Table Occurrence for this found set. (Can be the relationship name if this is a related set of a given record in the found set).
@@ -235,6 +233,7 @@ namespace FMdotNet__DataAPI
     /// <summary>
     /// Represents one FileMaker Record, including its related records if the layout shows a portal of related records.
     /// </summary>
+    [Serializable]
     public class FMRecord
     {
         /// <summary>
@@ -296,6 +295,7 @@ namespace FMdotNet__DataAPI
     /// <summary>
     /// Represents all records in the found set.
     /// </summary>
+    [Serializable]
     public class FMData
     {
         /// <summary>
@@ -324,18 +324,6 @@ namespace FMdotNet__DataAPI
             foundSet = new FMRecordSet(name, objectName);
         }
 
-        /*
-        public void AddRelatedTableName(string relatedTable)
-        {
-            relatedTableNames.Add(relatedTable);
-        }
-        */
-        /*
-        public void AddRecords(FMRecordSet allRecords)
-        {
-            records = allRecords;
-        }
-        */
     }
 
 
