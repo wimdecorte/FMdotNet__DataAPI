@@ -3,6 +3,8 @@ using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization;
 using System;
+using System.Data;
+
 
 namespace FMdotNet__DataAPI
 {
@@ -31,6 +33,12 @@ namespace FMdotNet__DataAPI
         /// </summary>
         /// <remarks><see cref="FMData"/></remarks>
         public FMData data { get; private set; }
+
+        /// <summary>
+        /// The FileMaker Data, in a native NET DataSet object.
+        /// </summary>
+        /// <value>The data set.</value>
+        public DataSet FMdataSet { get; private set; }
 
         /// <summary>
         /// The raw JSON returned by the FileMaker Data API.

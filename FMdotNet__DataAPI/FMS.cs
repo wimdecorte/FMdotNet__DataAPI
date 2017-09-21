@@ -212,12 +212,8 @@ namespace FMdotNet__DataAPI
             string url = BaseUrl + "auth/" + CurrentDatabase;
             string resultJson;
 
-            // clear the token regardless
-            token = "";
-
             //var client = new HttpClient();
             var client = webClient;
-
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("FM-Data-token", token);
 
@@ -226,6 +222,9 @@ namespace FMdotNet__DataAPI
             ErrorCodeOnlyResponse received = JsonConvert.DeserializeObject<ErrorCodeOnlyResponse>(resultJson);
 
             errorCode = Convert.ToInt32(received.errorCode);
+
+            // clear the token regardless of the logout result
+            token = "";
 
             return errorCode;
         }

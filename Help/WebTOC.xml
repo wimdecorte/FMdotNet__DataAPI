@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<HelpTOC>
+
+  <HelpTOCNode Id="77e5c6bd-7715-4e10-8849-fa02ee6e0427" Title="FMdotNet__DataAPI Namespace" Url="html/N-FMdotNet__DataAPI.htm">
+    <HelpTOCNode Id="007c727f-2f43-4c68-bbd4-b297478bb440" Title="Field Class" Url="html/T-FMdotNet__DataAPI.Field.htm">
+      <HelpTOCNode Title="Field Members" Url="html/AllMembers.T-FMdotNet__DataAPI.Field.htm" />
+      <HelpTOCNode Id="d5371e95-053f-4ec4-94d9-e6a7be4bc967" Title="Field Constructor " Url="html/Overload-FMdotNet__DataAPI.Field.-ctor.htm">
+        <HelpTOCNode Title="Field Constructor (String, String, Nullable(Int32), String, Nullable(Int32))" Url="html/M-FMdotNet__DataAPI.Field.-ctor.htm" />
+        <HelpTOCNode Title="Field Constructor (String)" Url="html/M-FMdotNet__DataAPI.Field.-ctor_1.htm" />
+        <HelpTOCNode Title="Field Constructor (String, String)" Url="html/M-FMdotNet__DataAPI.Field.-ctor_2.htm" />
+        <HelpTOCNode Title="Field Constructor (String, Int32)" Url="html/M-FMdotNet__DataAPI.Field.-ctor_3.htm" />
+        <HelpTOCNode Title="Field Constructor (String, Int32, String)" Url="html/M-FMdotNet__DataAPI.Field.-ctor_4.htm" />
+        <HelpTOCNode Title="Field Constructor (String, String, Int32, String)" Url="html/M-FMdotNet__DataAPI.Field.-ctor_5.htm" />
+        <HelpTOCNode Title="Field Constructor (String, String, Int32)" Url="html/M-FMdotNet__DataAPI.Field.-ctor_6.htm" />
+        <HelpTOCNode Title="Field Constructor (String, String, String, Int32)" Url="html/M-FMdotNet__DataAPI.Field.-ctor_7.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Title="Field Methods" Url="html/Methods.T-FMdotNet__DataAPI.Field.htm" />
+    </HelpTOCNode>
+    <HelpTOCNode Id="22408a67-d42e-4a67-83e8-1a303aa47c6f" Title="FMData Class" Url="html/T-FMdotNet__DataAPI.FMData.htm">
+      <HelpTOCNode Title="FMData Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMData.htm" />
+      <HelpTOCNode Title="FMData Constructor " Url="html/M-FMdotNet__DataAPI.FMData.-ctor.htm" />
+      <HelpTOCNode Title="FMData Methods" Url="html/Methods.T-FMdotNet__DataAPI.FMData.htm" />
+      <HelpTOCNode Id="16d72d95-7df9-4bb8-8a96-6ebfa4a28327" Title="FMData Properties" Url="html/Properties.T-FMdotNet__DataAPI.FMData.htm">
+        <HelpTOCNode Title="foundSet Property " Url="html/P-FMdotNet__DataAPI.FMData.foundSet.htm" />
+        <HelpTOCNode Title="relatedTableNames Property " Url="html/P-FMdotNet__DataAPI.FMData.relatedTableNames.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="d98700b0-c5ef-4174-8eed-16dfb757b0c9" Title="FMRecord Class" Url="html/T-FMdotNet__DataAPI.FMRecord.htm">
+      <HelpTOCNode Title="FMRecord Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMRecord.htm" />
+      <HelpTOCNode Title="FMRecord Methods" Url="html/Methods.T-FMdotNet__DataAPI.FMRecord.htm" />
+      <HelpTOCNode Id="91ea0536-84e2-4849-9188-9d251fe401ef" Title="FMRecord Properties" Url="html/Properties.T-FMdotNet__DataAPI.FMRecord.htm">
+        <HelpTOCNode Title="fieldsAndData Property " Url="html/P-FMdotNet__DataAPI.FMRecord.fieldsAndData.htm" />
+        <HelpTOCNode Title="modId Property " Url="html/P-FMdotNet__DataAPI.FMRecord.modId.htm" />
+        <HelpTOCNode Title="recordId Property " Url="html/P-FMdotNet__DataAPI.FMRecord.recordId.htm" />
+        <HelpTOCNode Title="relatedRecordSets Property " Url="html/P-FMdotNet__DataAPI.FMRecord.relatedRecordSets.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="0539b51b-f2eb-4ebe-9929-502457bd7d2e" Title="FMRecordSet Class" Url="html/T-FMdotNet__DataAPI.FMRecordSet.htm">
+      <HelpTOCNode Title="FMRecordSet Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMRecordSet.htm" />
+      <HelpTOCNode Id="f7268a6c-ccb1-4266-b069-9c93cb4ed53d" Title="FMRecordSet Methods" Url="html/Methods.T-FMdotNet__DataAPI.FMRecordSet.htm">
+        <HelpTOCNode Title="AddRecord Method " Url="html/M-FMdotNet__DataAPI.FMRecordSet.AddRecord.htm" />
+        <HelpTOCNode Title="updateNames Method " Url="html/M-FMdotNet__DataAPI.FMRecordSet.updateNames.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="e291c3c5-5c4a-4fa1-b0e6-24b97b644770" Title="FMRecordSet Properties" Url="html/Properties.T-FMdotNet__DataAPI.FMRecordSet.htm">
+        <HelpTOCNode Title="records Property " Url="html/P-FMdotNet__DataAPI.FMRecordSet.records.htm" />
+        <HelpTOCNode Title="tableLayoutObjectName Property " Url="html/P-FMdotNet__DataAPI.FMRecordSet.tableLayoutObjectName.htm" />
+        <HelpTOCNode Title="tableName Property " Url="html/P-FMdotNet__DataAPI.FMRecordSet.tableName.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="6ba36656-f331-4850-ad08-0eb16ea06588" Title="FMS Class" Url="html/T-FMdotNet__DataAPI.FMS.htm">
+      <HelpTOCNode Title="FMS Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.htm" />
+      <HelpTOCNode Id="83721ab4-9430-4903-a9d5-6489aad2b3b5" Title="FMS Constructor " Url="html/Overload-FMdotNet__DataAPI.FMS.-ctor.htm">
+        <HelpTOCNode Title="FMS Constructor (String, Int32, String, String, Int32)" Url="html/M-FMdotNet__DataAPI.FMS.-ctor.htm" />
+        <HelpTOCNode Title="FMS Constructor (String, String, String, Int32)" Url="html/M-FMdotNet__DataAPI.FMS.-ctor_1.htm" />
+        <HelpTOCNode Title="FMS Constructor (String, String, String)" Url="html/M-FMdotNet__DataAPI.FMS.-ctor_2.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="fafdada8-98fb-48e8-be49-28a872ee00cb" Title="FMS Methods" Url="html/Methods.T-FMdotNet__DataAPI.FMS.htm">
+        <HelpTOCNode Title="Authenticate Method " Url="html/M-FMdotNet__DataAPI.FMS.Authenticate.htm" />
+        <HelpTOCNode Title="CreateEmptyRecord Method " Url="html/M-FMdotNet__DataAPI.FMS.CreateEmptyRecord.htm" />
+        <HelpTOCNode Title="CreateRequest Method " Url="html/M-FMdotNet__DataAPI.FMS.CreateRequest.htm" />
+        <HelpTOCNode Title="DeleteRecord Method " Url="html/M-FMdotNet__DataAPI.FMS.DeleteRecord.htm" />
+        <HelpTOCNode Title="DeleteRelatedRecord Method " Url="html/M-FMdotNet__DataAPI.FMS.DeleteRelatedRecord.htm" />
+        <HelpTOCNode Id="45538553-bcf6-4c57-91dd-9073356e1f95" Title="EditRequest Method " Url="html/Overload-FMdotNet__DataAPI.FMS.EditRequest.htm">
+          <HelpTOCNode Title="EditRequest Method (Int32)" Url="html/M-FMdotNet__DataAPI.FMS.EditRequest.htm" />
+          <HelpTOCNode Title="EditRequest Method (Int32, Int32)" Url="html/M-FMdotNet__DataAPI.FMS.EditRequest_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="7ed48863-a13e-4865-bfea-cf665febd11a" Title="FindRequest Method " Url="html/Overload-FMdotNet__DataAPI.FMS.FindRequest.htm">
+          <HelpTOCNode Title="FindRequest Method " Url="html/M-FMdotNet__DataAPI.FMS.FindRequest.htm" />
+          <HelpTOCNode Title="FindRequest Method (Int32)" Url="html/M-FMdotNet__DataAPI.FMS.FindRequest_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="Logout Method " Url="html/M-FMdotNet__DataAPI.FMS.Logout.htm" />
+        <HelpTOCNode Title="NewRecordRequest Method " Url="html/M-FMdotNet__DataAPI.FMS.NewRecordRequest.htm" />
+        <HelpTOCNode Title="SetFile Method " Url="html/M-FMdotNet__DataAPI.FMS.SetFile.htm" />
+        <HelpTOCNode Title="SetLayout Method " Url="html/M-FMdotNet__DataAPI.FMS.SetLayout.htm" />
+        <HelpTOCNode Title="SetMultipleGlobalField Method " Url="html/M-FMdotNet__DataAPI.FMS.SetMultipleGlobalField.htm" />
+        <HelpTOCNode Id="2f9f3334-7a43-478e-b0d0-e95de06eb90a" Title="SetSingleGlobalField Method " Url="html/Overload-FMdotNet__DataAPI.FMS.SetSingleGlobalField.htm">
+          <HelpTOCNode Title="SetSingleGlobalField Method (String, String)" Url="html/M-FMdotNet__DataAPI.FMS.SetSingleGlobalField.htm" />
+          <HelpTOCNode Title="SetSingleGlobalField Method (String, String, Int32)" Url="html/M-FMdotNet__DataAPI.FMS.SetSingleGlobalField_1.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+      <HelpTOCNode Id="656301fa-b73f-4189-8d71-6f62cf0bafac" Title="FMS Properties" Url="html/Properties.T-FMdotNet__DataAPI.FMS.htm">
+        <HelpTOCNode Title="CurrentDatabase Property " Url="html/P-FMdotNet__DataAPI.FMS.CurrentDatabase.htm" />
+        <HelpTOCNode Title="CurrentLayout Property " Url="html/P-FMdotNet__DataAPI.FMS.CurrentLayout.htm" />
+        <HelpTOCNode Title="FMAccount Property " Url="html/P-FMdotNet__DataAPI.FMS.FMAccount.htm" />
+        <HelpTOCNode Title="Port Property " Url="html/P-FMdotNet__DataAPI.FMS.Port.htm" />
+        <HelpTOCNode Title="ResponseTimeout Property " Url="html/P-FMdotNet__DataAPI.FMS.ResponseTimeout.htm" />
+        <HelpTOCNode Title="ServerAddress Property " Url="html/P-FMdotNet__DataAPI.FMS.ServerAddress.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="f045c088-6bc6-4ea9-97ba-7cb29b01f832" Title="FMS.FieldSearch Class" Url="html/T-FMdotNet__DataAPI.FMS.FieldSearch.htm">
+      <HelpTOCNode Title="FMS.FieldSearch Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.FieldSearch.htm" />
+      <HelpTOCNode Id="05dec795-36b8-4703-9cfb-f2b9ce6691e5" Title="FieldSearch Constructor " Url="html/Overload-FMdotNet__DataAPI.FMS.FieldSearch.-ctor.htm">
+        <HelpTOCNode Title="FieldSearch Constructor (String, String, Boolean)" Url="html/M-FMdotNet__DataAPI.FMS.FieldSearch.-ctor.htm" />
+        <HelpTOCNode Title="FieldSearch Constructor (String, String)" Url="html/M-FMdotNet__DataAPI.FMS.FieldSearch.-ctor_1.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Title="FMS.FieldSearch Methods" Url="html/Methods.T-FMdotNet__DataAPI.FMS.FieldSearch.htm" />
+    </HelpTOCNode>
+    <HelpTOCNode Id="bd641512-f629-409e-ae3c-62bb82fb64a4" Title="FMS.Request Class" Url="html/T-FMdotNet__DataAPI.FMS.Request.htm">
+      <HelpTOCNode Title="FMS.Request Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.Request.htm" />
+      <HelpTOCNode Id="1edad8ef-6046-4ed9-8ff4-a6f3e98718b5" Title="FMS.Request Methods" Url="html/Methods.T-FMdotNet__DataAPI.FMS.Request.htm">
+        <HelpTOCNode Id="b1215143-7d77-4db2-af60-d69b5a324f76" Title="AddFieldSearch Method " Url="html/Overload-FMdotNet__DataAPI.FMS.Request.AddFieldSearch.htm">
+          <HelpTOCNode Title="AddFieldSearch Method (String, String, Boolean)" Url="html/M-FMdotNet__DataAPI.FMS.Request.AddFieldSearch.htm" />
+          <HelpTOCNode Title="AddFieldSearch Method (String, String)" Url="html/M-FMdotNet__DataAPI.FMS.Request.AddFieldSearch_1.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Title="FMS.SortDirection Enumeration" Url="html/T-FMdotNet__DataAPI.FMS.SortDirection.htm" />
+    <HelpTOCNode Id="0ee92adf-8624-4c42-9964-8cc113a48600" Title="RecordManipulationResponse Class" Url="html/T-FMdotNet__DataAPI.RecordManipulationResponse.htm">
+      <HelpTOCNode Title="RecordManipulationResponse Members" Url="html/AllMembers.T-FMdotNet__DataAPI.RecordManipulationResponse.htm" />
+      <HelpTOCNode Title="RecordManipulationResponse Methods" Url="html/Methods.T-FMdotNet__DataAPI.RecordManipulationResponse.htm" />
+      <HelpTOCNode Id="531a7c0d-a8c4-4867-906c-8409abb435db" Title="RecordManipulationResponse Properties" Url="html/Properties.T-FMdotNet__DataAPI.RecordManipulationResponse.htm">
+        <HelpTOCNode Title="errorCode Property " Url="html/P-FMdotNet__DataAPI.RecordManipulationResponse.errorCode.htm" />
+        <HelpTOCNode Title="errorMessage Property " Url="html/P-FMdotNet__DataAPI.RecordManipulationResponse.errorMessage.htm" />
+        <HelpTOCNode Title="recordId Property " Url="html/P-FMdotNet__DataAPI.RecordManipulationResponse.recordId.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="a18e4374-ed84-4417-8d5c-aaa42abc61f6" Title="RecordsGetResponse Class" Url="html/T-FMdotNet__DataAPI.RecordsGetResponse.htm">
+      <HelpTOCNode Title="RecordsGetResponse Members" Url="html/AllMembers.T-FMdotNet__DataAPI.RecordsGetResponse.htm" />
+      <HelpTOCNode Title="RecordsGetResponse Methods" Url="html/Methods.T-FMdotNet__DataAPI.RecordsGetResponse.htm" />
+      <HelpTOCNode Id="4fd40333-7188-469a-b4ca-b141458c422c" Title="RecordsGetResponse Properties" Url="html/Properties.T-FMdotNet__DataAPI.RecordsGetResponse.htm">
+        <HelpTOCNode Title="data Property " Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.data.htm" />
+        <HelpTOCNode Title="errorCode Property " Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.errorCode.htm" />
+        <HelpTOCNode Title="rawJson Property " Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.rawJson.htm" />
+        <HelpTOCNode Title="recordCount Property " Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.recordCount.htm" />
+        <HelpTOCNode Title="result Property " Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.result.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+  </HelpTOCNode>
+</HelpTOC>

@@ -3,6 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>.NET Standard 2.0 wrapper around the FileMaker Server Data API (FMS16+)</Description>
+    <PackageProjectUrl>https://github.com/wimdecorte/FMdotNet__DataAPI</PackageProjectUrl>
+    <PackageReleaseNotes>See GitHub repo.</PackageReleaseNotes>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<HelpKI>
+  <HelpKINode Title=".Execute method">
+    <HelpKINode Title="Execute Method " Url="html/M-FMdotNet__DataAPI.FMS.RecordCreateRequest.Execute.htm" />
+    <HelpKINode Title="Execute Method " Url="html/M-FMdotNet__DataAPI.FMS.RecordFindRequest.Execute.htm" />
+    <HelpKINode Title="Execute Method " Url="html/M-FMdotNet__DataAPI.FMS.RecordEditRequest.Execute.htm" />
+  </HelpKINode>
+  <HelpKINode Title=".SearchCriterium method" Url="html/M-FMdotNet__DataAPI.FMS.RecordFindRequest.SearchCriterium.htm" />
+  <HelpKINode Title=".setHowManyRecords method" Url="html/M-FMdotNet__DataAPI.FMS.RecordFindRequest.setHowManyRecords.htm" />
+  <HelpKINode Title=".setStartRecord method" Url="html/M-FMdotNet__DataAPI.FMS.RecordFindRequest.setStartRecord.htm" />
+  <HelpKINode Title="AddFieldSearch method" Url="html/Overload-FMdotNet__DataAPI.FMS.Request.AddFieldSearch.htm" />
+  <HelpKINode Title="AddRecord method" Url="html/M-FMdotNet__DataAPI.FMRecordSet.AddRecord.htm" />
+  <HelpKINode Title="ascend enumeration member" Url="html/T-FMdotNet__DataAPI.FMS.SortDirection.htm" />
+  <HelpKINode Title="ascend field" Url="html/F-FMdotNet__DataAPI.FMS.SortDirection.ascend.htm" />
+  <HelpKINode Title="Authenticate method" Url="html/M-FMdotNet__DataAPI.FMS.Authenticate.htm" />
+  <HelpKINode Title="CreateEmptyRecord method" Url="html/M-FMdotNet__DataAPI.FMS.CreateEmptyRecord.htm" />
+  <HelpKINode Title="CreateRequest method" Url="html/M-FMdotNet__DataAPI.FMS.CreateRequest.htm" />
+  <HelpKINode Title="CurrentDatabase property" Url="html/P-FMdotNet__DataAPI.FMS.CurrentDatabase.htm" />
+  <HelpKINode Title="CurrentLayout property" Url="html/P-FMdotNet__DataAPI.FMS.CurrentLayout.htm" />
+  <HelpKINode Title="data property" Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.data.htm" />
+  <HelpKINode Title="DeleteRecord method" Url="html/M-FMdotNet__DataAPI.FMS.DeleteRecord.htm" />
+  <HelpKINode Title="DeleteRelatedRecord method" Url="html/M-FMdotNet__DataAPI.FMS.DeleteRelatedRecord.htm" />
+  <HelpKINode Title="descend enumeration member" Url="html/T-FMdotNet__DataAPI.FMS.SortDirection.htm" />
+  <HelpKINode Title="descend field" Url="html/F-FMdotNet__DataAPI.FMS.SortDirection.descend.htm" />
+  <HelpKINode Title="EditRequest method" Url="html/Overload-FMdotNet__DataAPI.FMS.EditRequest.htm" />
+  <HelpKINode Title="errorCode property">
+    <HelpKINode Title="errorCode Property " Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.errorCode.htm" />
+    <HelpKINode Title="errorCode Property " Url="html/P-FMdotNet__DataAPI.RecordManipulationResponse.errorCode.htm" />
+  </HelpKINode>
+  <HelpKINode Title="errorMessage property" Url="html/P-FMdotNet__DataAPI.RecordManipulationResponse.errorMessage.htm" />
+  <HelpKINode Title="Execute method">
+    <HelpKINode Title="Execute Method " Url="html/M-FMdotNet__DataAPI.FMS.RecordFindRequest.Execute.htm" />
+    <HelpKINode Title="Execute Method " Url="html/M-FMdotNet__DataAPI.FMS.RecordEditRequest.Execute.htm" />
+    <HelpKINode Title="Execute Method " Url="html/M-FMdotNet__DataAPI.FMS.RecordCreateRequest.Execute.htm" />
+  </HelpKINode>
+  <HelpKINode Title="Field class">
+    <HelpKINode Title="Field Class" Url="html/T-FMdotNet__DataAPI.Field.htm" />
+    <HelpKINode Title="Field Members" Url="html/AllMembers.T-FMdotNet__DataAPI.Field.htm" />
+    <HelpKINode Title="about Field class" Url="html/T-FMdotNet__DataAPI.Field.htm" />
+    <HelpKINode Title="all members" Url="html/AllMembers.T-FMdotNet__DataAPI.Field.htm" />
+    <HelpKINode Title="constructor" Url="html/Overload-FMdotNet__DataAPI.Field.-ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods.T-FMdotNet__DataAPI.Field.htm" />
+  </HelpKINode>
+  <HelpKINode Title="Field.Field constructor" Url="html/Overload-FMdotNet__DataAPI.Field.-ctor.htm" />
+  <HelpKINode Title="fieldsAndData property" Url="html/P-FMdotNet__DataAPI.FMRecord.fieldsAndData.htm" />
+  <HelpKINode Title="FieldSearch class">
+    <HelpKINode Title="constructor" Url="html/Overload-FMdotNet__DataAPI.FMS.FieldSearch.-ctor.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FieldSearch.FieldSearch constructor" Url="html/Overload-FMdotNet__DataAPI.FMS.FieldSearch.-ctor.htm" />
+  <HelpKINode Title="FindRequest method" Url="html/Overload-FMdotNet__DataAPI.FMS.FindRequest.htm" />
+  <HelpKINode Title="FMAccount property" Url="html/P-FMdotNet__DataAPI.FMS.FMAccount.htm" />
+  <HelpKINode Title="FMData class">
+    <HelpKINode Title="FMData Class" Url="html/T-FMdotNet__DataAPI.FMData.htm" />
+    <HelpKINode Title="FMData Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMData.htm" />
+    <HelpKINode Title="about FMData class" Url="html/T-FMdotNet__DataAPI.FMData.htm" />
+    <HelpKINode Title="all members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMData.htm" />
+    <HelpKINode Title="constructor" Url="html/M-FMdotNet__DataAPI.FMData.-ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods.T-FMdotNet__DataAPI.FMData.htm" />
+    <HelpKINode Title="properties" Url="html/Properties.T-FMdotNet__DataAPI.FMData.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMData.FMData constructor" Url="html/M-FMdotNet__DataAPI.FMData.-ctor.htm" />
+  <HelpKINode Title="FMData.foundSet property" Url="html/P-FMdotNet__DataAPI.FMData.foundSet.htm" />
+  <HelpKINode Title="FMData.relatedTableNames property" Url="html/P-FMdotNet__DataAPI.FMData.relatedTableNames.htm" />
+  <HelpKINode Title="FMdotNet__DataAPI namespace" Url="html/N-FMdotNet__DataAPI.htm" />
+  <HelpKINode Title="FMdotNet__DataAPI.Field class">
+    <HelpKINode Title="Field Class" Url="html/T-FMdotNet__DataAPI.Field.htm" />
+    <HelpKINode Title="Field Members" Url="html/AllMembers.T-FMdotNet__DataAPI.Field.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMdotNet__DataAPI.FMData class">
+    <HelpKINode Title="FMData Class" Url="html/T-FMdotNet__DataAPI.FMData.htm" />
+    <HelpKINode Title="FMData Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMData.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMdotNet__DataAPI.FMRecord class">
+    <HelpKINode Title="FMRecord Class" Url="html/T-FMdotNet__DataAPI.FMRecord.htm" />
+    <HelpKINode Title="FMRecord Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMRecord.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMdotNet__DataAPI.FMRecordSet class">
+    <HelpKINode Title="FMRecordSet Class" Url="html/T-FMdotNet__DataAPI.FMRecordSet.htm" />
+    <HelpKINode Title="FMRecordSet Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMRecordSet.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMdotNet__DataAPI.FMS class">
+    <HelpKINode Title="FMS Class" Url="html/T-FMdotNet__DataAPI.FMS.htm" />
+    <HelpKINode Title="FMS Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMdotNet__DataAPI.FMS.FieldSearch class">
+    <HelpKINode Title="FMS.FieldSearch Class" Url="html/T-FMdotNet__DataAPI.FMS.FieldSearch.htm" />
+    <HelpKINode Title="FMS.FieldSearch Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.FieldSearch.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMdotNet__DataAPI.FMS.Request class">
+    <HelpKINode Title="FMS.Request Class" Url="html/T-FMdotNet__DataAPI.FMS.Request.htm" />
+    <HelpKINode Title="FMS.Request Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.Request.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMdotNet__DataAPI.FMS.SortDirection enumeration" Url="html/T-FMdotNet__DataAPI.FMS.SortDirection.htm" />
+  <HelpKINode Title="FMdotNet__DataAPI.RecordManipulationResponse class">
+    <HelpKINode Title="RecordManipulationResponse Class" Url="html/T-FMdotNet__DataAPI.RecordManipulationResponse.htm" />
+    <HelpKINode Title="RecordManipulationResponse Members" Url="html/AllMembers.T-FMdotNet__DataAPI.RecordManipulationResponse.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMdotNet__DataAPI.RecordsGetResponse class">
+    <HelpKINode Title="RecordsGetResponse Class" Url="html/T-FMdotNet__DataAPI.RecordsGetResponse.htm" />
+    <HelpKINode Title="RecordsGetResponse Members" Url="html/AllMembers.T-FMdotNet__DataAPI.RecordsGetResponse.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMRecord class">
+    <HelpKINode Title="FMRecord Class" Url="html/T-FMdotNet__DataAPI.FMRecord.htm" />
+    <HelpKINode Title="FMRecord Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMRecord.htm" />
+    <HelpKINode Title="about FMRecord class" Url="html/T-FMdotNet__DataAPI.FMRecord.htm" />
+    <HelpKINode Title="all members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMRecord.htm" />
+    <HelpKINode Title="methods" Url="html/Methods.T-FMdotNet__DataAPI.FMRecord.htm" />
+    <HelpKINode Title="properties" Url="html/Properties.T-FMdotNet__DataAPI.FMRecord.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMRecord.fieldsAndData property" Url="html/P-FMdotNet__DataAPI.FMRecord.fieldsAndData.htm" />
+  <HelpKINode Title="FMRecord.modId property" Url="html/P-FMdotNet__DataAPI.FMRecord.modId.htm" />
+  <HelpKINode Title="FMRecord.recordId property" Url="html/P-FMdotNet__DataAPI.FMRecord.recordId.htm" />
+  <HelpKINode Title="FMRecord.relatedRecordSets property" Url="html/P-FMdotNet__DataAPI.FMRecord.relatedRecordSets.htm" />
+  <HelpKINode Title="FMRecordSet class">
+    <HelpKINode Title="FMRecordSet Class" Url="html/T-FMdotNet__DataAPI.FMRecordSet.htm" />
+    <HelpKINode Title="FMRecordSet Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMRecordSet.htm" />
+    <HelpKINode Title="about FMRecordSet class" Url="html/T-FMdotNet__DataAPI.FMRecordSet.htm" />
+    <HelpKINode Title="all members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMRecordSet.htm" />
+    <HelpKINode Title="methods" Url="html/Methods.T-FMdotNet__DataAPI.FMRecordSet.htm" />
+    <HelpKINode Title="properties" Url="html/Properties.T-FMdotNet__DataAPI.FMRecordSet.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMRecordSet.AddRecord method" Url="html/M-FMdotNet__DataAPI.FMRecordSet.AddRecord.htm" />
+  <HelpKINode Title="FMRecordSet.records property" Url="html/P-FMdotNet__DataAPI.FMRecordSet.records.htm" />
+  <HelpKINode Title="FMRecordSet.tableLayoutObjectName property" Url="html/P-FMdotNet__DataAPI.FMRecordSet.tableLayoutObjectName.htm" />
+  <HelpKINode Title="FMRecordSet.tableName property" Url="html/P-FMdotNet__DataAPI.FMRecordSet.tableName.htm" />
+  <HelpKINode Title="FMRecordSet.updateNames method" Url="html/M-FMdotNet__DataAPI.FMRecordSet.updateNames.htm" />
+  <HelpKINode Title="FMS class">
+    <HelpKINode Title="FMS Class" Url="html/T-FMdotNet__DataAPI.FMS.htm" />
+    <HelpKINode Title="FMS Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.htm" />
+    <HelpKINode Title="about FMS class" Url="html/T-FMdotNet__DataAPI.FMS.htm" />
+    <HelpKINode Title="all members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.htm" />
+    <HelpKINode Title="constructor" Url="html/Overload-FMdotNet__DataAPI.FMS.-ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods.T-FMdotNet__DataAPI.FMS.htm" />
+    <HelpKINode Title="properties" Url="html/Properties.T-FMdotNet__DataAPI.FMS.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMS.Authenticate method" Url="html/M-FMdotNet__DataAPI.FMS.Authenticate.htm" />
+  <HelpKINode Title="FMS.CreateEmptyRecord method" Url="html/M-FMdotNet__DataAPI.FMS.CreateEmptyRecord.htm" />
+  <HelpKINode Title="FMS.CreateRequest method" Url="html/M-FMdotNet__DataAPI.FMS.CreateRequest.htm" />
+  <HelpKINode Title="FMS.CurrentDatabase property" Url="html/P-FMdotNet__DataAPI.FMS.CurrentDatabase.htm" />
+  <HelpKINode Title="FMS.CurrentLayout property" Url="html/P-FMdotNet__DataAPI.FMS.CurrentLayout.htm" />
+  <HelpKINode Title="FMS.DeleteRecord method" Url="html/M-FMdotNet__DataAPI.FMS.DeleteRecord.htm" />
+  <HelpKINode Title="FMS.DeleteRelatedRecord method" Url="html/M-FMdotNet__DataAPI.FMS.DeleteRelatedRecord.htm" />
+  <HelpKINode Title="FMS.EditRequest method" Url="html/Overload-FMdotNet__DataAPI.FMS.EditRequest.htm" />
+  <HelpKINode Title="FMS.FieldSearch class">
+    <HelpKINode Title="FMS.FieldSearch Class" Url="html/T-FMdotNet__DataAPI.FMS.FieldSearch.htm" />
+    <HelpKINode Title="FMS.FieldSearch Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.FieldSearch.htm" />
+    <HelpKINode Title="about FMS.FieldSearch class" Url="html/T-FMdotNet__DataAPI.FMS.FieldSearch.htm" />
+    <HelpKINode Title="all members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.FieldSearch.htm" />
+    <HelpKINode Title="methods" Url="html/Methods.T-FMdotNet__DataAPI.FMS.FieldSearch.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMS.FindRequest method" Url="html/Overload-FMdotNet__DataAPI.FMS.FindRequest.htm" />
+  <HelpKINode Title="FMS.FMAccount property" Url="html/P-FMdotNet__DataAPI.FMS.FMAccount.htm" />
+  <HelpKINode Title="FMS.FMS constructor" Url="html/Overload-FMdotNet__DataAPI.FMS.-ctor.htm" />
+  <HelpKINode Title="FMS.Logout method" Url="html/M-FMdotNet__DataAPI.FMS.Logout.htm" />
+  <HelpKINode Title="FMS.NewRecordRequest method" Url="html/M-FMdotNet__DataAPI.FMS.NewRecordRequest.htm" />
+  <HelpKINode Title="FMS.Port property" Url="html/P-FMdotNet__DataAPI.FMS.Port.htm" />
+  <HelpKINode Title="FMS.Request class">
+    <HelpKINode Title="FMS.Request Class" Url="html/T-FMdotNet__DataAPI.FMS.Request.htm" />
+    <HelpKINode Title="FMS.Request Members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.Request.htm" />
+    <HelpKINode Title="about FMS.Request class" Url="html/T-FMdotNet__DataAPI.FMS.Request.htm" />
+    <HelpKINode Title="all members" Url="html/AllMembers.T-FMdotNet__DataAPI.FMS.Request.htm" />
+    <HelpKINode Title="methods" Url="html/Methods.T-FMdotNet__DataAPI.FMS.Request.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FMS.ResponseTimeout property" Url="html/P-FMdotNet__DataAPI.FMS.ResponseTimeout.htm" />
+  <HelpKINode Title="FMS.ServerAddress property" Url="html/P-FMdotNet__DataAPI.FMS.ServerAddress.htm" />
+  <HelpKINode Title="FMS.SetFile method" Url="html/M-FMdotNet__DataAPI.FMS.SetFile.htm" />
+  <HelpKINode Title="FMS.SetLayout method" Url="html/M-FMdotNet__DataAPI.FMS.SetLayout.htm" />
+  <HelpKINode Title="FMS.SetMultipleGlobalField method" Url="html/M-FMdotNet__DataAPI.FMS.SetMultipleGlobalField.htm" />
+  <HelpKINode Title="FMS.SetSingleGlobalField method" Url="html/Overload-FMdotNet__DataAPI.FMS.SetSingleGlobalField.htm" />
+  <HelpKINode Title="FMS.SortDirection enumeration" Url="html/T-FMdotNet__DataAPI.FMS.SortDirection.htm" />
+  <HelpKINode Title="foundSet property" Url="html/P-FMdotNet__DataAPI.FMData.foundSet.htm" />
+  <HelpKINode Title="Logout method" Url="html/M-FMdotNet__DataAPI.FMS.Logout.htm" />
+  <HelpKINode Title="modId property" Url="html/P-FMdotNet__DataAPI.FMRecord.modId.htm" />
+  <HelpKINode Title="NewRecordRequest method" Url="html/M-FMdotNet__DataAPI.FMS.NewRecordRequest.htm" />
+  <HelpKINode Title="Port property" Url="html/P-FMdotNet__DataAPI.FMS.Port.htm" />
+  <HelpKINode Title="rawJson property" Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.rawJson.htm" />
+  <HelpKINode Title="recordCount property" Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.recordCount.htm" />
+  <HelpKINode Title="recordId property">
+    <HelpKINode Title="recordId Property " Url="html/P-FMdotNet__DataAPI.RecordManipulationResponse.recordId.htm" />
+    <HelpKINode Title="recordId Property " Url="html/P-FMdotNet__DataAPI.FMRecord.recordId.htm" />
+  </HelpKINode>
+  <HelpKINode Title="RecordManipulationResponse class">
+    <HelpKINode Title="RecordManipulationResponse Class" Url="html/T-FMdotNet__DataAPI.RecordManipulationResponse.htm" />
+    <HelpKINode Title="RecordManipulationResponse Members" Url="html/AllMembers.T-FMdotNet__DataAPI.RecordManipulationResponse.htm" />
+    <HelpKINode Title="about RecordManipulationResponse class" Url="html/T-FMdotNet__DataAPI.RecordManipulationResponse.htm" />
+    <HelpKINode Title="all members" Url="html/AllMembers.T-FMdotNet__DataAPI.RecordManipulationResponse.htm" />
+    <HelpKINode Title="methods" Url="html/Methods.T-FMdotNet__DataAPI.RecordManipulationResponse.htm" />
+    <HelpKINode Title="properties" Url="html/Properties.T-FMdotNet__DataAPI.RecordManipulationResponse.htm" />
+  </HelpKINode>
+  <HelpKINode Title="RecordManipulationResponse.errorCode property" Url="html/P-FMdotNet__DataAPI.RecordManipulationResponse.errorCode.htm" />
+  <HelpKINode Title="RecordManipulationResponse.errorMessage property" Url="html/P-FMdotNet__DataAPI.RecordManipulationResponse.errorMessage.htm" />
+  <HelpKINode Title="RecordManipulationResponse.recordId property" Url="html/P-FMdotNet__DataAPI.RecordManipulationResponse.recordId.htm" />
+  <HelpKINode Title="records property" Url="html/P-FMdotNet__DataAPI.FMRecordSet.records.htm" />
+  <HelpKINode Title="RecordsGetResponse class">
+    <HelpKINode Title="RecordsGetResponse Class" Url="html/T-FMdotNet__DataAPI.RecordsGetResponse.htm" />
+    <HelpKINode Title="RecordsGetResponse Members" Url="html/AllMembers.T-FMdotNet__DataAPI.RecordsGetResponse.htm" />
+    <HelpKINode Title="about RecordsGetResponse class" Url="html/T-FMdotNet__DataAPI.RecordsGetResponse.htm" />
+    <HelpKINode Title="all members" Url="html/AllMembers.T-FMdotNet__DataAPI.RecordsGetResponse.htm" />
+    <HelpKINode Title="methods" Url="html/Methods.T-FMdotNet__DataAPI.RecordsGetResponse.htm" />
+    <HelpKINode Title="properties" Url="html/Properties.T-FMdotNet__DataAPI.RecordsGetResponse.htm" />
+  </HelpKINode>
+  <HelpKINode Title="RecordsGetResponse.data property" Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.data.htm" />
+  <HelpKINode Title="RecordsGetResponse.errorCode property" Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.errorCode.htm" />
+  <HelpKINode Title="RecordsGetResponse.rawJson property" Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.rawJson.htm" />
+  <HelpKINode Title="RecordsGetResponse.recordCount property" Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.recordCount.htm" />
+  <HelpKINode Title="RecordsGetResponse.result property" Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.result.htm" />
+  <HelpKINode Title="relatedRecordSets property" Url="html/P-FMdotNet__DataAPI.FMRecord.relatedRecordSets.htm" />
+  <HelpKINode Title="relatedTableNames property" Url="html/P-FMdotNet__DataAPI.FMData.relatedTableNames.htm" />
+  <HelpKINode Title="Request.AddFieldSearch method" Url="html/Overload-FMdotNet__DataAPI.FMS.Request.AddFieldSearch.htm" />
+  <HelpKINode Title="ResponseTimeout property" Url="html/P-FMdotNet__DataAPI.FMS.ResponseTimeout.htm" />
+  <HelpKINode Title="result property" Url="html/P-FMdotNet__DataAPI.RecordsGetResponse.result.htm" />
+  <HelpKINode Title="SearchCriterium method" Url="html/M-FMdotNet__DataAPI.FMS.RecordFindRequest.SearchCriterium.htm" />
+  <HelpKINode Title="ServerAddress property" Url="html/P-FMdotNet__DataAPI.FMS.ServerAddress.htm" />
+  <HelpKINode Title="SetFile method" Url="html/M-FMdotNet__DataAPI.FMS.SetFile.htm" />
+  <HelpKINode Title="setHowManyRecords method" Url="html/M-FMdotNet__DataAPI.FMS.RecordFindRequest.setHowManyRecords.htm" />
+  <HelpKINode Title="SetLayout method" Url="html/M-FMdotNet__DataAPI.FMS.SetLayout.htm" />
+  <HelpKINode Title="SetMultipleGlobalField method" Url="html/M-FMdotNet__DataAPI.FMS.SetMultipleGlobalField.htm" />
+  <HelpKINode Title="SetSingleGlobalField method" Url="html/Overload-FMdotNet__DataAPI.FMS.SetSingleGlobalField.htm" />
+  <HelpKINode Title="setStartRecord method" Url="html/M-FMdotNet__DataAPI.FMS.RecordFindRequest.setStartRecord.htm" />
+  <HelpKINode Title="SortDirection.ascend field" Url="html/F-FMdotNet__DataAPI.FMS.SortDirection.ascend.htm" />
+  <HelpKINode Title="SortDirection.descend field" Url="html/F-FMdotNet__DataAPI.FMS.SortDirection.descend.htm" />
+  <HelpKINode Title="tableLayoutObjectName property" Url="html/P-FMdotNet__DataAPI.FMRecordSet.tableLayoutObjectName.htm" />
+  <HelpKINode Title="tableName property" Url="html/P-FMdotNet__DataAPI.FMRecordSet.tableName.htm" />
+  <HelpKINode Title="updateNames method" Url="html/M-FMdotNet__DataAPI.FMRecordSet.updateNames.htm" />
+</HelpKI>
