@@ -1,14 +1,18 @@
 ﻿using Newtonsoft.Json;
+using RestSharp;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FMdotNet__DataAPI
 {
     /// <summary>
     /// All of fmDotNet.
-    /// This version makes use of the new Data API introduced in FileMaker Server 16.
+    /// This version makes use of the official Data API released in FileMaker Server 17.
     /// As such it only supports HTTPS.
     /// Remember to force TLS 1.2 in your client if necessary. See the example console application for a way to do that.
     /// </summary>
@@ -19,6 +23,12 @@ namespace FMdotNet__DataAPI
         /// will generate a security warning.
         /// </summary>
         public string ServerAddress { get; private set; }
+
+        /// <summary>
+        /// The version of FMS - Data API is different in 16 than in 17 for instance.
+        /// </summary>
+        /// <value>The version.</value>
+        public int Version { get; private set; }
 
         /// <summary>
         /// Use this if you are using a non-standard HTTPS port in your FMS config.
@@ -32,6 +42,8 @@ namespace FMdotNet__DataAPI
 
         // using one HttpClient saves the actual client from having to spawn one for each call
         internal static HttpClient webClient { get; private set; }
+
+        internal static RestSharp.RestClient restClient { get; private set; }
 
         /// <summary>
         /// The name of the FileMaker file to target.  Set by the SetFile method.
@@ -58,6 +70,11 @@ namespace FMdotNet__DataAPI
         /// </summary>
 		internal string FMPassword { get; private set; }
 
+        /// <summary>
+        /// The folder where fmdotNet will save container data to.
+        /// </summary>
+        public string DownLoadFolder { get; private set; }
+
         //public int TotalRecords { get; private set; } // not sure we can get this except by all records
 
         /// <summary>
@@ -81,6 +98,34 @@ namespace FMdotNet__DataAPI
         /// </summary>
         internal RecordFindRequest findRequest { get; private set; }
 
+        /// <summary>
+        /// The FileMaker error code from the last call made.
+        /// </summary>
+        public int lastErrorCode { get; private set; }
+
+        /// <summary>
+        /// The FileMaker error code from the last script executed after the Data API call.
+        /// </summary>
+        public int lastErrorCodeScript { get; private set; }
+
+        /// <summary>
+        /// The FileMaker error code from the last script executed after the Data API call but before the sort.
+        /// </summary>
+        public int lastErrorCodeScriptPreSort { get; private set; }
+
+        /// <summary>
+        /// The FileMaker error code from the last script executed before the Data API call.
+        /// </summary>
+        public int lastErrorCodeScriptPreRequest { get; private set; }
+
+        /// <summary>
+        /// The FileMaker error message associated with the last error.
+        /// </summary>
+        public string lastErrorMessage { get; private set; }
+
+
+
+
         #region "Constructor Methods"
         /*
          * To Do:
@@ -100,22 +145,56 @@ namespace FMdotNet__DataAPI
         /// <param name="theAccount">The account.</param>
         /// <param name="thePW">The password.</param>
         /// <param name="timeOut">Milliseconds to wait for FMSA's response. (Default is 100,000 or 100 seconds).</param>
+        /// <param name="version">The version number of your FileMaker Server: 16 or 17</param>
         /// <remarks>The FMS Data API only works over HTTPS. Make sure the client supports TLS 1.2.  If it does not add something like this line to your code: System.Net.ServicePointManager.SecurityProtcol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;</remarks>
-        public FMS(string dnsName, int httpsPort, string theAccount, string thePW, int timeOut)
+        public FMS(string dnsName, int httpsPort, string theAccount, string thePW, int timeOut, int version)
         {
             ServerAddress = dnsName;
             Port = httpsPort;
             ResponseTimeout = timeOut;
             FMAccount = theAccount;
             FMPassword = thePW;
+            Version = version;
 
             webClient = new HttpClient();
+            restClient = new RestSharp.RestClient();
 
-            BaseUrl = "https://" + ServerAddress + ":" + Port + "/fmi/rest/api/";
+            if( Version == 16)
+            {
+                BaseUrl = "https://" + ServerAddress + ":" + Port + "/fmi/rest/api/";
+            }
+            else if(version > 16)
+            {
+                BaseUrl = "https://" + ServerAddress + ":" + Port + "/fmi/data/v1/";
+            }
+            restClient.BaseUrl = new System.Uri(BaseUrl);
 
             // ideally I'd do this below but seems to be not supported in Portable, only in platform specific code
             // System.Net.ServicePointManager.SecurityProtcol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            // so this needs to be done in whatever uses the DLL
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMS"/> class.
+        /// Assumes version 16 - for backward compatibility
+        /// </summary>
+        /// <param name="dnsName"></param>
+        /// <param name="theAccount"></param>
+        /// <param name="thePW"></param>
+        /// <param name="timeOut"></param>
+        public FMS(string dnsName, int httpsPort, string theAccount, string thePW, int timeOut) : this(dnsName, httpsPort, theAccount, thePW, timeOut, 16)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMS"/> class.
+        /// Assumes the standard HTTPS port of 443 and version 16
+        /// </summary>
+        /// <param name="dnsName"></param>
+        /// <param name="theAccount"></param>
+        /// <param name="thePW"></param>
+        /// <param name="timeOut"></param>
+        public FMS(string dnsName, string theAccount, string thePW, int timeOut) : this(dnsName, 443, theAccount, thePW, timeOut, 16)
+        {}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FMS"/> class.
@@ -125,24 +204,57 @@ namespace FMdotNet__DataAPI
         /// <param name="theAccount"></param>
         /// <param name="thePW"></param>
         /// <param name="timeOut"></param>
-        public FMS(string dnsName, string theAccount, string thePW, int timeOut) : this(dnsName, 443, theAccount, thePW, timeOut)
-        {
-        }
+        /// <param name="version"></param>
+        public FMS(string dnsName, string theAccount, string thePW, int timeOut, int version) : this(dnsName, 443, theAccount, thePW, timeOut, version)
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FMS"/> class.
-        /// Assumes default port 443 and default timeout 100 secs or 100,000ms
+        /// Assumes default port 443 and default timeout 100 secs or 100,000ms, and version 16
         /// </summary>
         /// <param name="dnsName"></param>
         /// <param name="theAccount"></param>
         /// <param name="thePW"></param>
-        public FMS(string dnsName, string theAccount, string thePW) : this(dnsName, 443, theAccount, thePW, 100000)
+        /// <param name="version"></param>
+        public FMS(string dnsName, string theAccount, string thePW) : this(dnsName, 443, theAccount, thePW, 100000, 16)
         {
         }
+
 
         #endregion
 
         #region "public methods"
+
+        // because HttpClient does not have a PATCH async method
+        /// <summary>
+        /// patch as an asynchronous operation.
+        /// </summary>
+        /// <param name="client">The client.</param>
+        /// <param name="requestUri">The request URI.</param>
+        /// <param name="iContent">The HttpContent to send.</param>
+        /// <returns>Task&lt;HttpResponseMessage&gt;.</returns>
+        internal async Task<HttpResponseMessage> PatchAsync(HttpClient client, string requestUrl, HttpContent iContent)
+        {
+            var method = new HttpMethod("PATCH");
+
+            Uri requestUri = new Uri(requestUrl);
+            var request = new HttpRequestMessage(method, requestUri)
+            {
+                Content = iContent
+            };
+
+            HttpResponseMessage response = new HttpResponseMessage();
+            // In case you want to set a timeout
+            //CancellationToken cancellationToken = new CancellationTokenSource(60).Token;
+
+
+            response = await client.SendAsync(request);
+            // If you want to use the timeout you set
+            //response = await client.SendRequestAsync(request).AsTask(cancellationToken);
+
+
+            return response;
+        }
 
         /// <summary>
         /// Sets the target FileMaker file.
@@ -166,30 +278,104 @@ namespace FMdotNet__DataAPI
         }
 
         /// <summary>
-        /// Gets a token based on the provided info.  Make sure to set the target file and target layout first.
+        /// Sets the folder where container data will be downloaded to.
         /// </summary>
-        public async System.Threading.Tasks.Task<string> Authenticate()
+        /// <param name="folder">The folder.</param>
+        public void SetDownloadFolder(string folder)
+        {
+            DownLoadFolder = folder;
+        }
+
+        /// <summary>
+        /// Gets a token based on the provided info.  Make sure to set the target file and for FMS16, the target layout first.
+        /// </summary>
+        public async Task<string> Authenticate()
         {
             token = "";
             string resultJson;
-            string url = BaseUrl + "auth/" + CurrentDatabase;
+            string url = string.Empty;
+            if(Version == 16)
+            {
+                url = BaseUrl + "auth/" + CurrentDatabase;
+            }
+            else if(Version > 16)
+            {
+                // 17 uses Basic Authentication, not a json payload with the username and pw
+                url = BaseUrl + "databases/" + CurrentDatabase + "/sessions";
+                var byteArray = Encoding.ASCII.GetBytes(FMAccount + ":" + FMPassword);
+                webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+            }
 
-            // construct the json
-            AuthPayload payload = new AuthPayload(FMAccount, FMPassword, CurrentLayout);
-            string payloadJson = payload.ToJSON();
-
-            // var client = new HttpClient();
-            // var client = webClient;
             try
             {
-                var response = await webClient.PostAsync(url, new StringContent(payloadJson, Encoding.UTF8, "application/json"));
+                HttpResponseMessage response = null;
+                if(Version == 16)
+                {
+                    // construct the json
+                    AuthPayload payload = new AuthPayload(FMAccount, FMPassword, CurrentLayout);
+                    string payloadJson = payload.ToJSON();
+                    response = await webClient.PostAsync(url, new StringContent(payloadJson, Encoding.UTF8, "application/json"));
+                }
+                else if( Version > 16)
+                {
+                    // empty json as the body as per the api documentation, probably works without a body too as per my Postman testing
+                    response = await webClient.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
+                }
+               
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
+                    // get the json from the response body
                     resultJson = await response.Content.ReadAsStringAsync();
-                    AuthResponse received = JsonConvert.DeserializeObject<AuthResponse>(resultJson);
-                    token = received.token;
-                    // add the token here once, don't have to do it again then
-                    webClient.DefaultRequestHeaders.Add("FM-Data-token", token);
+
+                    if (Version == 16)
+                    {
+                        // token is in the response body
+                        AuthResponse received = JsonConvert.DeserializeObject<AuthResponse>(resultJson);
+                        token = received.token;
+                        // add the token here once, don't have to do it again then
+                        webClient.DefaultRequestHeaders.Add("FM-Data-token", token);
+                    }
+                    else if(Version > 16)
+                    {
+                        // token is in the response body
+                        // body will also contain an error code :
+                        /*
+                            {
+                                "response": {
+                                    "token": "3eaed56b71f0ba0c6ca8d2984e7a681e3bbada56d48b1b21ab4"
+                                },
+                                "messages": [
+                                    {
+                                        "code": "0",
+                                        "message": "OK"
+                                    }
+                                ]
+                            }
+                        */
+                        Response17 received = JsonConvert.DeserializeObject<Response17>(resultJson);
+                        if(received.messages[0].code == "0")
+                        {
+                            token = received.response.token;
+                            // old code during beta testing when token was in the headers
+                            /*
+                            IEnumerable<string> values;
+                            if (response.Headers.TryGetValues("X-FM-Data-Access-Token", out values))
+                            {
+                                token = values.First();
+                                // clear the headers, we still have basic auth in there
+                                webClient.DefaultRequestHeaders.Clear();
+                                //webClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                                webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                            }
+                            */
+
+                            // clear the default headers to get rid of the auth header since we'll be re-using webclient
+                           webClient.DefaultRequestHeaders.Clear();
+
+                            // add the new header
+                            webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                        }
+                    }
                 }
             }
             catch(Exception ex)
@@ -197,8 +383,6 @@ namespace FMdotNet__DataAPI
                 //If it fails it could be because of the TLS issue
                 token = "Error - " + ex.Message;
             }
-
-
             return token;
         }
 
@@ -208,20 +392,40 @@ namespace FMdotNet__DataAPI
         /// <returns>error code, 0 if no error.</returns>
         public async System.Threading.Tasks.Task<int> Logout()
         {
-            int errorCode;
-            string url = BaseUrl + "auth/" + CurrentDatabase;
+            int errorCode = 0;
+            string url = string.Empty;
+            if (Version == 16)
+            {
+                url = BaseUrl + "auth/" + CurrentDatabase;
+            }
+            else if (Version > 16)
+            {
+                url = BaseUrl + "databases/" + CurrentDatabase + "/sessions/" + token;
+            }
+            
             string resultJson;
 
             //var client = new HttpClient();
             var client = webClient;
             client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("FM-Data-token", token);
+            if(Version == 16)
+                client.DefaultRequestHeaders.Add("FM-Data-token", token);
+            else if( Version > 16)
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var response = await client.DeleteAsync(url);
             resultJson = await response.Content.ReadAsStringAsync();
-            ErrorCodeOnlyResponse received = JsonConvert.DeserializeObject<ErrorCodeOnlyResponse>(resultJson);
 
-            errorCode = Convert.ToInt32(received.errorCode);
+            if (Version == 16)
+            {
+                ErrorCodeOnlyResponse received = JsonConvert.DeserializeObject<ErrorCodeOnlyResponse>(resultJson);
+                errorCode = Convert.ToInt32(received.errorCode);
+            }
+            else if(Version > 16)
+            {
+                Response17 received = JsonConvert.DeserializeObject<Response17>(resultJson);
+                errorCode = Convert.ToInt32(received.messages[0].code);
+            }
 
             // clear the token regardless of the logout outcome, that will force a new login
             token = "";
@@ -229,19 +433,9 @@ namespace FMdotNet__DataAPI
             return errorCode;
         }
 
-        /// <summary>
-        /// Creates a new empty record in the specified file, in the table associates with the specified layout (context).
-        /// </summary>
-        /// <returns>A <see cref="RecordManipulationResponse"></see> response</returns>
-        public async System.Threading.Tasks.Task<RecordManipulationResponse> CreateEmptyRecord()
-        {
-            var request = new EmptyRecordCreateRequest(this);
-            var response = await request.Execute();
-            return response;
-        }
 
         /// <summary>
-        /// Method to call to create a new record request and specify options for it later.
+        /// Method to create a new record request and specify options for it later.
         /// </summary>
         /// <returns> <see cref="RecordCreateRequest"/></returns>
         public RecordCreateRequest NewRecordRequest()
@@ -252,7 +446,7 @@ namespace FMdotNet__DataAPI
 
 
         /// <summary>
-        /// Method to call to create a record modification request and specify options for it later.
+        /// Method to call the record modification request and specify options for it later.
         /// </summary>
         /// <param name="recId">The internal FileMaker record id for the record to edit.</param>
         /// <returns><see cref="RecordEditRequest"/></returns>
@@ -263,7 +457,7 @@ namespace FMdotNet__DataAPI
         }
 
         /// <summary>
-        /// Method to call to create a record modification request and specify options for it later.
+        /// Method to call a record modification request and specify options for it later.
         /// </summary>
         /// <param name="recId">The internal FileMaker record id for the record to edit.</param>
         /// <param name="modId">The internal FileMaker modification id for the record to edit. If the record has a different modification Id than specified, an error will be returned.</param>
@@ -276,7 +470,7 @@ namespace FMdotNet__DataAPI
 
 
         /// <summary>
-        /// Method to call to create a find request and specify options for it later.
+        /// Method to call a find request and specify options for it later.
         /// </summary>
         /// <returns><see cref="RecordFindRequest"/></returns>
         public RecordFindRequest FindRequest()
@@ -286,7 +480,7 @@ namespace FMdotNet__DataAPI
         }
 
         /// <summary>
-        /// Method to call to create a find request and specify options for it later.
+        /// Method to call a find request and specify options for it later.
         /// </summary>
         /// <param name="recId">The internal FileMaker record id for the record to find.</param>
         /// <returns></returns>
@@ -297,7 +491,19 @@ namespace FMdotNet__DataAPI
         }
 
         /// <summary>
-        /// Method to call to create a new records and specify options for it later.
+        /// Method to call a find request and specify options for it later.
+        /// </summary>
+        /// <param name="recId">The internal FileMaker record id for the record to find.</param>
+        /// <param name="responseLayout">The FileMaker layout to use to return the data (only fields on this layout will be returned).</param>
+        /// <returns></returns>
+        public RecordFindRequest FindRequest(int recId, string responseLayout)
+        {
+            findRequest = new RecordFindRequest(this, recId, responseLayout);
+            return findRequest;
+        }
+
+        /// <summary>
+        /// Method to create a new records and specify options for it later.
         /// </summary>
         /// <returns></returns>
         public RecordCreateRequest CreateRequest()
@@ -306,13 +512,245 @@ namespace FMdotNet__DataAPI
             return createRequest;
         }
 
-
         // add the rest here
-        
+
 
         #endregion
 
+        /// <summary>
+        /// Sets the last error properties.
+        /// </summary>
+        /// <param name="code">The code.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="response">The response that contains the json sent by FMS.</param>
+        private void SetLastError(int code, string message, Response response)
+        {
+            lastErrorCode = code;
+            lastErrorMessage = message;
+            lastErrorCodeScript = Convert.ToInt16(response.scriptError);
+            lastErrorCodeScriptPreRequest = Convert.ToInt16(response.scriptErrorPreRequest);
+            lastErrorCodeScriptPreSort = Convert.ToInt16(response.scriptErrorPreSort);
+        }
 
+        /// <summary>
+        /// Sets the last error properties.
+        /// </summary>
+        /// <param name="code">The code.</param>
+        /// <param name="message">The message.</param>
+        private void SetLastError(int code, string message)
+        {
+            lastErrorCode = code;
+            lastErrorMessage = message;
+            lastErrorCodeScript = 0;
+            lastErrorCodeScriptPreRequest = 0;
+            lastErrorCodeScriptPreSort = 0;
+        }
+
+        /// <summary>
+        /// Modify the request to add teh calls to the FM scripts.
+        /// </summary>
+        /// <param name="requestToModify">The request to modify.</param>
+        /// <param name="scripts">The List of FMscript objects to add.</param>
+        /// <returns>RestSharp.RestRequest.</returns>
+        private RestSharp.RestRequest buildScriptsURLpart(RestSharp.RestRequest requestToModify, List<FMSscript> scripts)
+        {
+            if (Version > 16 && scripts != null && scripts.Count >= 1)
+            {
+                foreach (FMSscript s in scripts)
+                {
+                    if (s.type == ScriptTypes.after)
+                    {
+                        requestToModify.AddParameter("script", s.name, ParameterType.QueryString);
+                        if (s.parameter != null)
+                        {
+                            requestToModify.AddParameter("script.param", s.parameter, ParameterType.QueryString);
+                        }
+                    }
+                    else if (s.type == ScriptTypes.before)
+                    {
+                        requestToModify.AddParameter("script,prerequest", s.name, ParameterType.QueryString);
+                        if (s.parameter != null)
+                        {
+                            requestToModify.AddParameter("script.prerequest.param", s.parameter, ParameterType.QueryString);
+                        }
+                    }
+                    else if (s.type == ScriptTypes.beforeSort)
+                    {
+                        requestToModify.AddParameter("script,presort", s.name, ParameterType.QueryString);
+                        if (s.parameter != null)
+                        {
+                            requestToModify.AddParameter("script.presort.param", s.parameter, ParameterType.QueryString);
+                        }
+                    }
+                }
+            }
+            return requestToModify;
+        }
+
+        /// <summary>
+        /// Builds out the URL with the FM scripts to call.
+        /// </summary>
+        /// <param name="scripts">The list of FMscript objects to add.</param>
+        /// <returns>modified URL</returns>
+        private string buildScriptsURLpart(List<FMSscript> scripts)
+        {
+            // need to have:
+            // ?script=log&script.param=runs after delete&script.prerequest=log&script.prerequest.param=runs before the delete&script.presort=log&script.presort.param=runs after delete but before sort
+            string urlPart = string.Empty;
+
+            if (Version > 16 && scripts != null && scripts.Count >= 1)
+            {
+                List<string> parts = new List<string>();
+
+                foreach (FMSscript s in scripts)
+                {
+                    if (s.type == ScriptTypes.after)
+                    {
+                        parts.Add("script=" + s.name);
+                        if (s.parameter != null)
+                        {
+                            parts.Add("script.param=" + s.parameter);
+                        }
+                    }
+                    else if (s.type == ScriptTypes.before)
+                    {
+                        parts.Add("script.prerequest=" + s.name);
+                        if (s.parameter != null)
+                        {
+                            parts.Add("script.prerequest.param=" + s.parameter);
+                        }
+                    }
+                    else if (s.type == ScriptTypes.beforeSort)
+                    {
+                        parts.Add("script.presort=" + s.name);
+                        if (s.parameter != null)
+                        {
+                            parts.Add("script.presort.param=" + s.parameter);
+                        }
+                    }
+                }
+
+                // combine the parts into one string with the & delimiter
+                urlPart = "?" + String.Join("&", parts);
+            }
+
+            return urlPart;
+
+        }
 
     }
+
+    /// <summary>
+    /// Represents a FileMaker Server 17 deployment.
+    /// </summary>
+    /// <seealso cref="FMdotNet__DataAPI.FMS" />
+    public partial class FMS17 : FMS
+    {
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMS"/> class.
+        /// Assumes version 17 or higher
+        /// </summary>
+        /// <param name="dnsName"></param>
+        /// <param name="theAccount"></param>
+        /// <param name="thePW"></param>
+        /// <param name="timeOut"></param>
+        public FMS17(string dnsName, int httpsPort, string theAccount, string thePW, int timeOut) : base(dnsName, httpsPort, theAccount, thePW, timeOut, 17)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMS"/> class.
+        /// Assumes the standard HTTPS port of 443 and version 16
+        /// </summary>
+        /// <param name="dnsName"></param>
+        /// <param name="theAccount"></param>
+        /// <param name="thePW"></param>
+        /// <param name="timeOut"></param>
+        public FMS17(string dnsName, string theAccount, string thePW, int timeOut) : base(dnsName, 443, theAccount, thePW, timeOut, 17)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMS"/> class.
+        /// Assumes the standard HTTPS port of 443
+        /// </summary>
+        /// <param name="dnsName"></param>
+        /// <param name="theAccount"></param>
+        /// <param name="thePW"></param>
+        /// <param name="timeOut"></param>
+        /// <param name="version"></param>
+        public FMS17(string dnsName, string theAccount, string thePW, int timeOut, int version) : base(dnsName, 443, theAccount, thePW, timeOut, version)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMS"/> class.
+        /// Assumes default port 443 and default timeout 100 secs or 100,000ms, and version 16
+        /// </summary>
+        /// <param name="dnsName"></param>
+        /// <param name="theAccount"></param>
+        /// <param name="thePW"></param>
+        /// <param name="version"></param>
+        public FMS17(string dnsName, string theAccount, string thePW) : base(dnsName, 443, theAccount, thePW, 100000, 17)
+        {
+        }
+
+    }
+
+    /// <summary>
+    /// Represents a FileMaker script to execute.
+    /// </summary>
+    public partial class FMSscript
+    {
+        /// <summary>
+        /// The FileMaker script name.
+        /// </summary>
+        /// <value>The name.</value>
+        public string name { get; private set; }
+        /// <summary>
+        /// The parameter to pass to the script.
+        /// </summary>
+        /// <value>The parameter.</value>
+        public string parameter { get; private set; }
+        /// <summary>
+        /// The script type, determines when the script will be executed.
+        /// </summary>
+        /// <value>The type.</value>
+        public ScriptTypes type { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMSscript"/> class.
+        /// </summary>
+        /// <param name="scriptType">Type of the script.</param>
+        /// <param name="scriptName">Name of the script.</param>
+        /// <param name="scriptParameter">The script parameter.</param>
+        public FMSscript( ScriptTypes scriptType, string scriptName, string scriptParameter) : this(scriptType, scriptName)
+        {
+            parameter = scriptParameter;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMSscript"/> class, passes no parameter to the script.
+        /// </summary>
+        /// <param name="scriptType">Type of the script.</param>
+        /// <param name="scriptName">Name of the script.</param>
+        public FMSscript(ScriptTypes scriptType, string scriptName)
+        {
+            type = scriptType;
+            name = scriptName;
+        }
+    }
+
+    /// <summary>
+    /// The three script types, differentiated by when they are executed
+    /// </summary>
+    public enum ScriptTypes
+    {
+        after,
+        before,
+        beforeSort
+    }
+
+
+
 }

@@ -8,6 +8,7 @@ namespace FMdotNet__DataAPI
     /// </summary>
     public class Field
 	{
+        internal int fmsVersion { get; set; }
 
 		internal string fieldName { get; set; }
 		internal string tableOccurance { get; set; }
@@ -17,6 +18,8 @@ namespace FMdotNet__DataAPI
         internal bool hasRecordId { get; set; } // default value is false
 
 		internal string fullName { get; private set; }
+
+        internal string portalObjectName { get; private set; }
 
 		internal KeyValuePair<string, string> namveValuePair { get; private set; }
 
@@ -29,10 +32,14 @@ namespace FMdotNet__DataAPI
         /// <param name="repetition">The repetition number.</param>
         /// <param name="value">The field value.</param>
         /// <param name="recId">The internal FileMaker  record Id.</param>
-        public Field(string name, string TO, int? repetition, string value, int? recId)
+        /// <param name="version">The version of FileMaker SErver</param>
+        /// <param name="portalName">The name of the portal that contains this field</param>
+        public Field(string name, string TO, int? repetition, string value, int? recId, int version, string portalName)
 		{
 			fieldName = name;
 			tableOccurance = TO;
+            portalObjectName = portalName;
+            fmsVersion = version;
 
             if(repetition.HasValue)
 			    repetitionNumber = repetition.Value;
@@ -53,14 +60,14 @@ namespace FMdotNet__DataAPI
         /// Initializes a new instance of the <see cref="Field"/> class.
         /// </summary>
         /// <param name="name">The field name.</param>
-        public Field(string name) : this(name, "", 0, "", null)
+        public Field(string name, int version) : this(name, "", 0, "", null, version, string.Empty)
         { }
         /// <summary>
         /// Initializes a new instance of the <see cref="Field"/> class.
         /// </summary>
         /// <param name="name">The field name.</param>
         /// <param name="value">The field value.</param>
-        public Field(string name, string value) : this(name, "", 0, value, null)
+        public Field(string name, string value, int version) : this(name, "", 0, value, null, version, string.Empty)
         { }
 
         /// <summary>
@@ -68,7 +75,7 @@ namespace FMdotNet__DataAPI
         /// </summary>
         /// <param name="name">The field name.</param>
         /// <param name="repetition">The repetition number.</param>
-        public Field(string name, int repetition) : this(name, "", repetition, "", null)
+        public Field(string name, int repetition, int version) : this(name, "", repetition, "", null, version, string.Empty)
         { }
         
         /// <summary>
@@ -77,7 +84,7 @@ namespace FMdotNet__DataAPI
         /// <param name="name">The field name.</param>
         /// <param name="repetition">The repetition number.</param>
         /// <param name="value">The field value.</param>
-        public Field(string name, int repetition, string value) : this(name, "", repetition, value, null)
+        public Field(string name, int repetition, string value, int version) : this(name, "", repetition, value, null, version, string.Empty)
         { }
 
         /// <summary>
@@ -87,7 +94,7 @@ namespace FMdotNet__DataAPI
         /// <param name="TO">The table occurance for the field.</param>
         /// <param name="repetition">The repetition number.</param>
         /// <param name="value">The field value.</param>
-        public Field(string name,string TO, int repetition, string value) : this(name, TO, repetition, value, null)
+        public Field(string name,string TO, int repetition, string value, int version) : this(name, TO, repetition, value, null, version, string.Empty)
         { }
 
         /// <summary>
@@ -96,7 +103,7 @@ namespace FMdotNet__DataAPI
         /// <param name="name">The field name.</param>
         /// <param name="value">The field value.</param>
         /// <param name="recId">The internal FileMaker  record Id.</param>
-        public Field( string name, string value, int recId) : this(name, "", 0, value, recId)
+        public Field( string name, string value, int recId, int version) : this(name, "", 0, value, recId, version, string.Empty)
         { }
 
         /// <summary>
@@ -106,7 +113,7 @@ namespace FMdotNet__DataAPI
         /// <param name="TO">The table occurance for the field.</param>
         /// <param name="value">The field value.</param>
         /// <param name="recId">The internal FileMaker  record Id.</param>
-        public Field(string name, string TO, string value, int recId) : this(name, TO, 0, value, recId)
+        public Field(string name, string TO, string value, int recId, int version) : this(name, TO, 0, value, version, recId, string.Empty)
         {}
 
 
@@ -121,13 +128,21 @@ namespace FMdotNet__DataAPI
 				fullyQualifiedName = tableOccurance + "::" + fieldName;
 			}
 
-			if (repetitionNumber > 0 )
+			if (repetitionNumber > 1 )
 			{
 				fullyQualifiedName = fullyQualifiedName + "(" + repetitionNumber.ToString() + ")";
 			}
             if(hasRecordId == true)
             {
-                fullyQualifiedName = fullyQualifiedName + "." + recordId.ToString();
+                if (fmsVersion > 16)
+                {
+                    // do nothing, using .0 to create a new related record does not work anymore
+                    // and same with .1234 to address a related record to change it
+                }
+                else
+                {
+                    fullyQualifiedName = fullyQualifiedName + "." + recordId.ToString();
+                }
             }
 
 			return fullyQualifiedName;
