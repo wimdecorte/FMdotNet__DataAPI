@@ -106,7 +106,7 @@ namespace FMdotNet__DataAPI
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
-                var received = JsonConvert.DeserializeObject<Response17>(resultJson);
+                var received = JsonConvert.DeserializeObject<Received>(resultJson);
                 code = Convert.ToInt32(received.messages[0].code);
                 SetLastError(code, received.messages[0].message, received.response);
             }
@@ -152,16 +152,9 @@ namespace FMdotNet__DataAPI
         {
             string url = string.Empty;
             string endpoint = string.Empty;
-            if (Version == 16)
-            {
-                endpoint = "/record/" + CurrentDatabase + "/" + CurrentLayout + "/" + recordId;
-                url = BaseUrl + endpoint;
-            }
-            else if (Version > 16)
-            {
-                endpoint = "databases/" + CurrentDatabase + "/layouts/" + CurrentLayout + "/records/" + recordId;
-                url = BaseUrl + endpoint;
-            }
+
+            endpoint = "databases/" + CurrentDatabase + "/layouts/" + CurrentLayout + "/records/" + recordId;
+            url = BaseUrl + endpoint;
 
             // create a RestSharp request:
             var request = new RestRequest
@@ -173,11 +166,11 @@ namespace FMdotNet__DataAPI
             request.AddHeader("Authorization", "Bearer " + token);
 
             // add scripts
-            if (Version > 16 && scripts != null)
+            if (scripts != null)
             {
                 // build url addendum here
                 url = url + buildScriptsURLpart(scripts);
-                request = buildScriptsURLpart(request, scripts);
+                request = BuildScriptsURLpart(request, scripts);
             }
 
             IRestResponse apiResponse = await restClient.ExecuteTaskAsync(request);
@@ -185,16 +178,8 @@ namespace FMdotNet__DataAPI
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
-                if (Version == 16)
-                {
-                    var received = JsonConvert.DeserializeObject<RecordManipulationResponse>(resultJson);
-                    SetLastError(received.errorCode, received.errorMessage);
-                }
-                else if (Version > 16)
-                {
-                    var received = JsonConvert.DeserializeObject<Response17>(resultJson);
-                    SetLastError( Convert.ToInt32(received.messages[0].code), received.messages[0].message, received.response);
-                }
+                var received = JsonConvert.DeserializeObject<Received>(resultJson);
+                SetLastError( Convert.ToInt32(received.messages[0].code), received.messages[0].message, received.response);
             }
             else
             {
@@ -241,10 +226,7 @@ namespace FMdotNet__DataAPI
         public async Task<int> SetMultipleGlobalField(List<Field> fieldsAndValues)
         {
             string url = string.Empty;
-            if (Version == 16)
-                url = BaseUrl + "/global/" + CurrentDatabase + "/" + CurrentLayout + "/";
-            else if (Version > 16)
-                url = BaseUrl + "databases/" + CurrentDatabase + "/globals";
+            url = BaseUrl + "databases/" + CurrentDatabase + "/globals";
 
 
             JObject payloadJson = new JObject();
@@ -263,26 +245,15 @@ namespace FMdotNet__DataAPI
             StringContent body = new StringContent(payloadJson.ToString(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage apiResponse = null;
-            if (Version == 16)
-                apiResponse = await webClient.PutAsync(url, body);
-            else if(Version > 16 )
-                apiResponse = await PatchAsync(webClient, url, body);
+            apiResponse = await PatchAsync(webClient, url, body);
 
             string resultJson = await apiResponse.Content.ReadAsStringAsync();
 
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
-                if (Version == 16)
-                {
-                    var received = JsonConvert.DeserializeObject<RecordManipulationResponse>(resultJson);
-                    SetLastError(received.errorCode, received.errorMessage);
-                }
-                else if (Version > 16)
-                {
-                    var received = JsonConvert.DeserializeObject<Response17>(resultJson);
-                    SetLastError(Convert.ToInt32(received.messages[0].code), received.messages[0].message, received.response);
-                }
+                var received = JsonConvert.DeserializeObject<Received>(resultJson);
+                SetLastError(Convert.ToInt32(received.messages[0].code), received.messages[0].message, received.response);
             }
             else
             {
@@ -351,7 +322,7 @@ namespace FMdotNet__DataAPI
             //public string errorMessage { get; set; }
             /// <exclude />
             public RecordManipulationResponse response { get; internal set; }
-            public Response17 NonRecordResponse { get; internal set; }
+            public Received NonRecordResponse { get; internal set; }
 
             // constructor
             internal RecordRequest(FMS fileMakerServer)
@@ -361,16 +332,9 @@ namespace FMdotNet__DataAPI
                 fmScripts = new List<FMSscript>();
                 fieldKeyValuePairs = new List<KeyValuePair<string, string>>();
                 fms = fileMakerServer;
-                if (fms.Version == 16)
-                {
-                    endpoint = "record/" + fileMakerServer.CurrentDatabase + "/" + fileMakerServer.CurrentLayout;
-                    url = fileMakerServer.BaseUrl + endpoint;
-                }
-                else if (fms.Version > 16)
-                {
-                    endpoint = "databases/" + fileMakerServer.CurrentDatabase + "/layouts/" + fileMakerServer.CurrentLayout + "/records";
-                    url = fileMakerServer.BaseUrl + endpoint;
-                }
+
+                endpoint = "databases/" + fileMakerServer.CurrentDatabase + "/layouts/" + fileMakerServer.CurrentLayout + "/records";
+                url = fileMakerServer.BaseUrl + endpoint;
             }
 
             internal RecordRequest(FMS fileMakerServer, int modId) : this(fileMakerServer)
@@ -539,20 +503,11 @@ namespace FMdotNet__DataAPI
 
 
             /// <exclude />
-            internal RecordManipulationResponse Parse16Response(string json)
-            {
-
-                response = JsonConvert.DeserializeObject<RecordManipulationResponse>(json);
-                int code = response.errorCode;
-                string message = response.errorMessage;
-                fms.SetLastError(code, message);
-                return response;
-            }
 
             /// <exclude />
-            internal Response17 Parse17Response(string json)
+            internal Received ParseResponse(string json)
             {
-                NonRecordResponse = JsonConvert.DeserializeObject<Response17>(json);
+                NonRecordResponse = JsonConvert.DeserializeObject<Received>(json);
                 int code = 0;
                 if (NonRecordResponse.messages[0].code == null)
                     code = 9999;
@@ -585,26 +540,17 @@ namespace FMdotNet__DataAPI
             /// Executes the request.
             /// </summary>
             /// <returns>Response object.</returns>
-            public async Task<Response17> Execute()
+            public async Task<Received> Execute()
             {
                 // create the payload, an empty {}
                 string payloadJson = string.Empty;
-                /* no payload needed
-                if (fms.Version == 16)
-                    payloadJson = "{\"data\":{}}";
-                else if (fms.Version > 16)
-                    payloadJson = "{\"fieldData\":{}}";
-                    */
 
-                if (fms.Version == 16)
-                    url = fms.BaseUrl + "/record/" + fms.CurrentDatabase + "/" + fms.CurrentLayout + "/" + recId;
-                else if (fms.Version > 16)
-                    url = fms.BaseUrl + "databases/" + fms.CurrentDatabase + "/layouts/" + fms.CurrentLayout + "/records/" + recId;
+                url = fms.BaseUrl + "databases/" + fms.CurrentDatabase + "/layouts/" + fms.CurrentLayout + "/records/" + recId;
                 HttpContent body = new StringContent(payloadJson);
                 body.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
                 // if there are scripts, add them
-                if( fms.Version > 16 && fmScripts != null && fmScripts.Count > 0)
+                if(fmScripts != null && fmScripts.Count > 0)
                 {
                     url = url + fms.buildScriptsURLpart(fmScripts);
                 }
@@ -612,7 +558,7 @@ namespace FMdotNet__DataAPI
                 // doing a POST
                 var apiResponse = await webClient.PostAsync(url, body);
                 string resultJson = await apiResponse.Content.ReadAsStringAsync();
-                NonRecordResponse = JsonConvert.DeserializeObject<Response17>(resultJson);
+                NonRecordResponse = JsonConvert.DeserializeObject<Received>(resultJson);
 
                 return NonRecordResponse;
             }
@@ -626,24 +572,6 @@ namespace FMdotNet__DataAPI
             public EmptyRecordCreateRequest(FMS fileMakerServer) : base(fileMakerServer)
             { }
             
-
-            /// <exclude />
-            private async Task<RecordManipulationResponse> GetResponseFor16()
-            {
-                // create the payload, an empty {}
-                string payloadJson = string.Empty;
-                payloadJson = "{\"data\":{}}";
-
-                HttpContent body = new StringContent(payloadJson);
-                body.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-                // doing a POST
-                var apiResponse = await webClient.PostAsync(url, body);
-                string resultJson = await apiResponse.Content.ReadAsStringAsync();
-                response = JsonConvert.DeserializeObject<RecordManipulationResponse>(resultJson);
-
-                return response;
-            }
         }
 
 
@@ -681,18 +609,10 @@ namespace FMdotNet__DataAPI
                 
                 string resultJson = apiResponse.Content;
 
-                if (fms.Version == 16)
-                {
-                    Parse16Response(resultJson);
-                    if (fms.lastErrorCode == 0)
-                        newRecordId = Convert.ToInt32(response.recordId);
-                }
-                else if(fms.Version > 16)
-                {
-                    Parse17Response(resultJson);
-                    if (fms.lastErrorCode == 0)
-                        newRecordId = Convert.ToInt32(NonRecordResponse.response.recordId);
-                }
+
+                ParseResponse(resultJson);
+                if (fms.lastErrorCode == 0)
+                    newRecordId = Convert.ToInt32(NonRecordResponse.response.recordId);
 
                 return newRecordId;
             }
@@ -758,15 +678,8 @@ namespace FMdotNet__DataAPI
                 request.AddParameter("application/json", payloadJson, ParameterType.RequestBody);
                 request.AddHeader("Authorization", "Bearer " + fms.token);
 
-                if (fms.Version == 16)
-                {
-                    // main difference with record creation is the PUT here instead of the POST
-                    request.Method = Method.PUT;
-                }
-                else if(fms.Version > 16)
-                {
-                    request.Method = Method.PATCH;
-                }
+                request.Method = Method.PATCH;
+
                 IRestResponse apiResponse = restClient.Execute(request);
                 var statusCode = apiResponse.StatusCode;
                 string resultJson = apiResponse.Content;
@@ -775,23 +688,11 @@ namespace FMdotNet__DataAPI
 
                 var reasonPhrase = apiResponse.StatusDescription;
 
-                if (fms.Version == 16)
-                {
-                    response = Parse16Response(resultJson);
-                    if (response.errorCode == 0)
-                    {
-                        // 16 does not return the mod id
-                        newModificationId = Convert.ToInt32(response.recordId);
-                    }
-                }
-                else if (fms.Version > 16)
-                {
-                    NonRecordResponse=Parse17Response(resultJson);
-                    if (NonRecordResponse.messages[0].code == "0")
-                        newModificationId = Convert.ToInt32(NonRecordResponse.response.modId);
-                    else if (NonRecordResponse.messages[0].code == string.Empty || NonRecordResponse.messages[0].code == null)
-                        NonRecordResponse.messages[0].code = "99999999999";
-                }
+                NonRecordResponse=ParseResponse(resultJson);
+                if (NonRecordResponse.messages[0].code == "0")
+                    newModificationId = Convert.ToInt32(NonRecordResponse.response.modId);
+                else if (NonRecordResponse.messages[0].code == string.Empty || NonRecordResponse.messages[0].code == null)
+                    NonRecordResponse.messages[0].code = "99999999999";
 
                 return newModificationId;
             }
@@ -823,16 +724,10 @@ namespace FMdotNet__DataAPI
             foreach (Portal thePortal in portals)
             {
                 if (thePortal.startRecord > 0)
-                    if(Version == 16)
-                        offset = offset + "&offset." + thePortal.portalName + "=" + thePortal.startRecord;
-                    else if(Version > 16)
-                        offset = offset + "&_offset." + thePortal.portalName + "=" + thePortal.startRecord;
+                    offset = offset + "&_offset." + thePortal.portalName + "=" + thePortal.startRecord;
 
                 if (thePortal.howManyRecords > 0)
-                    if (Version == 16)
-                        range = range + "&range." + thePortal.portalName + "=" + thePortal.howManyRecords;
-                    else if (Version > 16)
-                        range = range + "&_limit." + thePortal.portalName + "=" + thePortal.howManyRecords;
+                    range = range + "&_limit." + thePortal.portalName + "=" + thePortal.howManyRecords;
             }
 
             if (offset.Length > 1)
@@ -876,20 +771,10 @@ namespace FMdotNet__DataAPI
                 responseLayout = layoutForResponse;
                 fms = fileMakerServer;
                 recordId = recId;
-                if (fms.Version == 16)
-                {
-                    if (recId == 0)
-                        url = fileMakerServer.BaseUrl + "{{placeholder}}" + fms.CurrentDatabase + "/" + fms.CurrentLayout;
-                    else
-                        url = fileMakerServer.BaseUrl + "record/" + fms.CurrentDatabase + "/" + fms.CurrentLayout + "/" + recId;
-                }
-                else if (fms.Version > 16)
-                {
-                    if (recId == 0)
-                        url = fileMakerServer.BaseUrl + "databases/" + fms.CurrentDatabase + "/layouts/" + fms.CurrentLayout; // + "/_find"; --> need to decide on _find later
-                    else
-                        url = fileMakerServer.BaseUrl + "databases/" + fms.CurrentDatabase + "/layouts/" + fms.CurrentLayout + "/records/" + recId;
-                }
+                if (recId == 0)
+                    url = fileMakerServer.BaseUrl + "databases/" + fms.CurrentDatabase + "/layouts/" + fms.CurrentLayout; // + "/_find"; --> need to decide on _find later
+                else
+                    url = fileMakerServer.BaseUrl + "databases/" + fms.CurrentDatabase + "/layouts/" + fms.CurrentLayout + "/records/" + recId;
                 // portals = portalsToInclude;
                 // findWhat = new FindCriteria();
                 howManyRecords = 0;
@@ -969,28 +854,18 @@ namespace FMdotNet__DataAPI
 
                 if (sorts != null && sorts.Count > 0)
                 {
-                    if (fms.Version == 16)
-                        sort = "sort=" + JsonConvert.SerializeObject(sorts);
-                    else if (fms.Version > 16)
-                        sort = "_sort=" + JsonConvert.SerializeObject(sorts);
-
+                    sort = "_sort=" + JsonConvert.SerializeObject(sorts);
                     pieces.Add(sort);
                 }
 
                 if (howManyRecords > 0)
                 {
-                    if (fms.Version == 16)
-                        range = "range=" + howManyRecords;
-                    else if (fms.Version > 16)
-                        range = "_limit=" + howManyRecords;
+                    range = "_limit=" + howManyRecords;
                     pieces.Add(range);
                 }
                 if (startRecord > 1)
                 {
-                    if (fms.Version == 16)
-                        offset = "offset=" + startRecord;
-                    else if (fms.Version > 16)
-                        offset = "_offset=" + startRecord;
+                    offset = "_offset=" + startRecord;
                     pieces.Add(offset);
                 }
 
@@ -1083,8 +958,6 @@ namespace FMdotNet__DataAPI
                     if (pieces.Count > 0)
                         url = url + "?" + string.Join("&", pieces.ToArray());
 
-                    if(fms.Version == 16)
-                        url = url.Replace("{{placeholder}}", "record/");
                     // using GET
                     apiResponse = await webClient.GetAsync(url);
                 }
@@ -1142,7 +1015,7 @@ namespace FMdotNet__DataAPI
                     if (responseLayout != string.Empty)
                         payloadJson.Add("layout.response", responseLayout);
 
-                    if (fms.Version > 16 && scripts != null && scripts.Count >= 1)
+                    if (scripts != null && scripts.Count >= 1)
                     {
                         foreach (FMSscript s in scripts)
                         {
@@ -1198,10 +1071,7 @@ namespace FMdotNet__DataAPI
                             string pName = p.portalName;
                             portalNames.Add(pName);
                             if(p.howManyRecords > 0)
-                                if(fms.Version == 16)
-                                    payloadJson.Add("range." + pName, p.howManyRecords);
-                                else if(fms.Version > 16)
-                                    payloadJson.Add("limit." + pName, p.howManyRecords);
+                                payloadJson.Add("limit." + pName, p.howManyRecords);
                             if (p.startRecord > 1)
                                 payloadJson.Add("offset." + pName, p.startRecord);
                         }
@@ -1212,8 +1082,6 @@ namespace FMdotNet__DataAPI
                     string body = payloadJson.ToString();
 
                     // POST the payload
-                    if (fms.Version == 16)
-                        url = url.Replace("{{placeholder}}", "find/");
                     apiResponse = await webClient.PostAsync(url, new StringContent(body, Encoding.UTF8, "application/json"));
                 }
 
@@ -1223,34 +1091,22 @@ namespace FMdotNet__DataAPI
 
 
                 RecordsGetResponse received = new RecordsGetResponse();
-                if (fms.Version == 16)
-                {
-                    var response = JsonConvert.DeserializeObject<RecordManipulationResponse>(resultJsonString);
-                    int code = response.errorCode;
-                    string message = response.errorMessage;
-                    if (code == 0)
-                        received = new RecordsGetResponse(resultJson);
-                    else
-                        received = new RecordsGetResponse(Convert.ToInt16(apiResponse.StatusCode), apiResponse.ReasonPhrase);
-                    fms.SetLastError(code, message);
-                }
-                else if (fms.Version > 16)
-                {
-                    var response = JsonConvert.DeserializeObject<Response17>(resultJsonString);
 
-                    int code = Convert.ToInt32(response.messages[0].code);
-                    string message = response.messages[0].message;
-                    if (code == 0 && apiResponse.StatusCode == HttpStatusCode.OK)
-                        received = new RecordsGetResponse(resultJson);
-                    else if (code == 0 && apiResponse.StatusCode != HttpStatusCode.OK)
-                    {
-                        code = (int)apiResponse.StatusCode;
-                        received = new RecordsGetResponse(resultJson);
-                    }
-                    else
-                        received = new RecordsGetResponse(Convert.ToInt16(apiResponse.StatusCode), apiResponse.ReasonPhrase + " - FMS says: " + response.messages[0].message);
-                    fms.SetLastError(code, message, response.response);
+                var response = JsonConvert.DeserializeObject<Received>(resultJsonString);
+
+                int code = Convert.ToInt32(response.messages[0].code);
+                string message = response.messages[0].message;
+                if (code == 0 && apiResponse.StatusCode == HttpStatusCode.OK)
+                    received = new RecordsGetResponse(resultJson);
+                else if (code == 0 && apiResponse.StatusCode != HttpStatusCode.OK)
+                {
+                    code = (int)apiResponse.StatusCode;
+                    received = new RecordsGetResponse(resultJson);
                 }
+                else
+                    received = new RecordsGetResponse(Convert.ToInt16(apiResponse.StatusCode), apiResponse.ReasonPhrase + " - FMS says: " + response.messages[0].message);
+                fms.SetLastError(code, message, response.response);
+
                 return received;
             }
 

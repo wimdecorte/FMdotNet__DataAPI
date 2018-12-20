@@ -132,18 +132,6 @@ namespace FMdotNet__DataAPI
 			{
 				fullyQualifiedName = fullyQualifiedName + "(" + repetitionNumber.ToString() + ")";
 			}
-            if(hasRecordId == true)
-            {
-                if (fmsVersion > 16)
-                {
-                    // do nothing, using .0 to create a new related record does not work anymore
-                    // and same with .1234 to address a related record to change it
-                }
-                else
-                {
-                    fullyQualifiedName = fullyQualifiedName + "." + recordId.ToString();
-                }
-            }
 
 			return fullyQualifiedName;
 					

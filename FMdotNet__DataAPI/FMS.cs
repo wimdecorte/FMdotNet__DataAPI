@@ -25,7 +25,7 @@ namespace FMdotNet__DataAPI
         public string ServerAddress { get; private set; }
 
         /// <summary>
-        /// The version of FMS - Data API is different in 16 than in 17 for instance.
+        /// The version of FMS - Data API is different in 17 than in 18 for instance.
         /// </summary>
         /// <value>The version.</value>
         public int Version { get; private set; }
@@ -145,7 +145,7 @@ namespace FMdotNet__DataAPI
         /// <param name="theAccount">The account.</param>
         /// <param name="thePW">The password.</param>
         /// <param name="timeOut">Milliseconds to wait for FMSA's response. (Default is 100,000 or 100 seconds).</param>
-        /// <param name="version">The version number of your FileMaker Server: 16 or 17</param>
+        /// <param name="version">The version number of your FileMaker Server: 18 or 17</param>
         /// <remarks>The FMS Data API only works over HTTPS. Make sure the client supports TLS 1.2.  If it does not add something like this line to your code: System.Net.ServicePointManager.SecurityProtcol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;</remarks>
         public FMS(string dnsName, int httpsPort, string theAccount, string thePW, int timeOut, int version)
         {
@@ -159,13 +159,13 @@ namespace FMdotNet__DataAPI
             webClient = new HttpClient();
             restClient = new RestSharp.RestClient();
 
-            if( Version == 16)
-            {
-                BaseUrl = "https://" + ServerAddress + ":" + Port + "/fmi/rest/api/";
-            }
-            else if(version > 16)
+            if( Version == 17)
             {
                 BaseUrl = "https://" + ServerAddress + ":" + Port + "/fmi/data/v1/";
+            }
+            else if(version > 17)
+            {
+                BaseUrl = "https://" + ServerAddress + ":" + Port + "/fmi/data/vLatest/";
             }
             restClient.BaseUrl = new System.Uri(BaseUrl);
 
@@ -174,27 +174,6 @@ namespace FMdotNet__DataAPI
             // so this needs to be done in whatever uses the DLL
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FMS"/> class.
-        /// Assumes version 16 - for backward compatibility
-        /// </summary>
-        /// <param name="dnsName"></param>
-        /// <param name="theAccount"></param>
-        /// <param name="thePW"></param>
-        /// <param name="timeOut"></param>
-        public FMS(string dnsName, int httpsPort, string theAccount, string thePW, int timeOut) : this(dnsName, httpsPort, theAccount, thePW, timeOut, 16)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FMS"/> class.
-        /// Assumes the standard HTTPS port of 443 and version 16
-        /// </summary>
-        /// <param name="dnsName"></param>
-        /// <param name="theAccount"></param>
-        /// <param name="thePW"></param>
-        /// <param name="timeOut"></param>
-        public FMS(string dnsName, string theAccount, string thePW, int timeOut) : this(dnsName, 443, theAccount, thePW, timeOut, 16)
-        {}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FMS"/> class.
@@ -208,17 +187,6 @@ namespace FMdotNet__DataAPI
         public FMS(string dnsName, string theAccount, string thePW, int timeOut, int version) : this(dnsName, 443, theAccount, thePW, timeOut, version)
         { }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FMS"/> class.
-        /// Assumes default port 443 and default timeout 100 secs or 100,000ms, and version 16
-        /// </summary>
-        /// <param name="dnsName"></param>
-        /// <param name="theAccount"></param>
-        /// <param name="thePW"></param>
-        /// <param name="version"></param>
-        public FMS(string dnsName, string theAccount, string thePW) : this(dnsName, 443, theAccount, thePW, 100000, 16)
-        {
-        }
 
 
         #endregion
@@ -287,94 +255,57 @@ namespace FMdotNet__DataAPI
         }
 
         /// <summary>
-        /// Gets a token based on the provided info.  Make sure to set the target file and for FMS16, the target layout first.
+        /// Gets a token based on the provided info.  Make sure to set the target file first.
         /// </summary>
         public async Task<string> Authenticate()
         {
             token = "";
             string resultJson;
             string url = string.Empty;
-            if(Version == 16)
-            {
-                url = BaseUrl + "auth/" + CurrentDatabase;
-            }
-            else if(Version > 16)
-            {
-                // 17 uses Basic Authentication, not a json payload with the username and pw
-                url = BaseUrl + "databases/" + CurrentDatabase + "/sessions";
-                var byteArray = Encoding.ASCII.GetBytes(FMAccount + ":" + FMPassword);
-                webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-            }
+            
+            url = BaseUrl + "databases/" + CurrentDatabase + "/sessions";
+            var byteArray = Encoding.ASCII.GetBytes(FMAccount + ":" + FMPassword);
+            webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
 
             try
             {
                 HttpResponseMessage response = null;
-                if(Version == 16)
-                {
-                    // construct the json
-                    AuthPayload payload = new AuthPayload(FMAccount, FMPassword, CurrentLayout);
-                    string payloadJson = payload.ToJSON();
-                    response = await webClient.PostAsync(url, new StringContent(payloadJson, Encoding.UTF8, "application/json"));
-                }
-                else if( Version > 16)
-                {
-                    // empty json as the body as per the api documentation, probably works without a body too as per my Postman testing
-                    response = await webClient.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
-                }
+
+                // empty json as the body as per the api documentation, probably works without a body too as per my Postman testing
+                response = await webClient.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
+
                
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     // get the json from the response body
                     resultJson = await response.Content.ReadAsStringAsync();
 
-                    if (Version == 16)
-                    {
-                        // token is in the response body
-                        AuthResponse received = JsonConvert.DeserializeObject<AuthResponse>(resultJson);
-                        token = received.token;
-                        // add the token here once, don't have to do it again then
-                        webClient.DefaultRequestHeaders.Add("FM-Data-token", token);
-                    }
-                    else if(Version > 16)
-                    {
-                        // token is in the response body
-                        // body will also contain an error code :
-                        /*
-                            {
-                                "response": {
-                                    "token": "3eaed56b71f0ba0c6ca8d2984e7a681e3bbada56d48b1b21ab4"
-                                },
-                                "messages": [
-                                    {
-                                        "code": "0",
-                                        "message": "OK"
-                                    }
-                                ]
-                            }
-                        */
-                        Response17 received = JsonConvert.DeserializeObject<Response17>(resultJson);
-                        if(received.messages[0].code == "0")
+                    // token is in the response body
+                    // body will also contain an error code :
+                    /*
                         {
-                            token = received.response.token;
-                            // old code during beta testing when token was in the headers
-                            /*
-                            IEnumerable<string> values;
-                            if (response.Headers.TryGetValues("X-FM-Data-Access-Token", out values))
-                            {
-                                token = values.First();
-                                // clear the headers, we still have basic auth in there
-                                webClient.DefaultRequestHeaders.Clear();
-                                //webClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
-                                webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                            }
-                            */
-
-                            // clear the default headers to get rid of the auth header since we'll be re-using webclient
-                           webClient.DefaultRequestHeaders.Clear();
-
-                            // add the new header
-                            webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                            "response": {
+                                "token": "3eaed56b71f0ba0c6ca8d2984e7a681e3bbada56d48b1b21ab4"
+                            },
+                            "messages": [
+                                {
+                                    "code": "0",
+                                    "message": "OK"
+                                }
+                            ]
                         }
+                    */
+                    Received received = JsonConvert.DeserializeObject<Received>(resultJson);
+                    if(received.messages[0].code == "0")
+                    {
+                        token = received.response.token;
+
+                        // clear the default headers to get rid of the auth header since we'll be re-using webclient
+                        webClient.DefaultRequestHeaders.Clear();
+
+                        // add the new header
+                        webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                     }
                 }
             }
@@ -394,38 +325,21 @@ namespace FMdotNet__DataAPI
         {
             int errorCode = 0;
             string url = string.Empty;
-            if (Version == 16)
-            {
-                url = BaseUrl + "auth/" + CurrentDatabase;
-            }
-            else if (Version > 16)
-            {
-                url = BaseUrl + "databases/" + CurrentDatabase + "/sessions/" + token;
-            }
-            
+
+            url = BaseUrl + "databases/" + CurrentDatabase + "/sessions/" + token;
+
             string resultJson;
 
             //var client = new HttpClient();
             var client = webClient;
             client.DefaultRequestHeaders.Clear();
-            if(Version == 16)
-                client.DefaultRequestHeaders.Add("FM-Data-token", token);
-            else if( Version > 16)
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var response = await client.DeleteAsync(url);
             resultJson = await response.Content.ReadAsStringAsync();
 
-            if (Version == 16)
-            {
-                ErrorCodeOnlyResponse received = JsonConvert.DeserializeObject<ErrorCodeOnlyResponse>(resultJson);
-                errorCode = Convert.ToInt32(received.errorCode);
-            }
-            else if(Version > 16)
-            {
-                Response17 received = JsonConvert.DeserializeObject<Response17>(resultJson);
-                errorCode = Convert.ToInt32(received.messages[0].code);
-            }
+            Received received = JsonConvert.DeserializeObject<Received>(resultJson);
+            errorCode = Convert.ToInt32(received.messages[0].code);
 
             // clear the token regardless of the logout outcome, that will force a new login
             token = "";
@@ -552,9 +466,9 @@ namespace FMdotNet__DataAPI
         /// <param name="requestToModify">The request to modify.</param>
         /// <param name="scripts">The List of FMscript objects to add.</param>
         /// <returns>RestSharp.RestRequest.</returns>
-        private RestSharp.RestRequest buildScriptsURLpart(RestSharp.RestRequest requestToModify, List<FMSscript> scripts)
+        private RestSharp.RestRequest BuildScriptsURLpart(RestSharp.RestRequest requestToModify, List<FMSscript> scripts)
         {
-            if (Version > 16 && scripts != null && scripts.Count >= 1)
+            if (scripts != null && scripts.Count >= 1)
             {
                 foreach (FMSscript s in scripts)
                 {
@@ -598,7 +512,7 @@ namespace FMdotNet__DataAPI
             // ?script=log&script.param=runs after delete&script.prerequest=log&script.prerequest.param=runs before the delete&script.presort=log&script.presort.param=runs after delete but before sort
             string urlPart = string.Empty;
 
-            if (Version > 16 && scripts != null && scripts.Count >= 1)
+            if (scripts != null && scripts.Count >= 1)
             {
                 List<string> parts = new List<string>();
 
@@ -660,7 +574,7 @@ namespace FMdotNet__DataAPI
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FMS"/> class.
-        /// Assumes the standard HTTPS port of 443 and version 16
+        /// Assumes the standard HTTPS port of 443 and version 17
         /// </summary>
         /// <param name="dnsName"></param>
         /// <param name="theAccount"></param>
@@ -685,13 +599,66 @@ namespace FMdotNet__DataAPI
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FMS"/> class.
-        /// Assumes default port 443 and default timeout 100 secs or 100,000ms, and version 16
+        /// Assumes default port 443 and default timeout 100 secs or 100,000ms, and version 17
         /// </summary>
         /// <param name="dnsName"></param>
         /// <param name="theAccount"></param>
         /// <param name="thePW"></param>
         /// <param name="version"></param>
         public FMS17(string dnsName, string theAccount, string thePW) : base(dnsName, 443, theAccount, thePW, 100000, 17)
+        {
+        }
+
+    }
+
+    public partial class FMS18 : FMS
+    {
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMS"/> class.
+        /// Assumes version 17 or higher
+        /// </summary>
+        /// <param name="dnsName"></param>
+        /// <param name="theAccount"></param>
+        /// <param name="thePW"></param>
+        /// <param name="timeOut"></param>
+        public FMS18(string dnsName, int httpsPort, string theAccount, string thePW, int timeOut) : base(dnsName, httpsPort, theAccount, thePW, timeOut, 18)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMS"/> class.
+        /// Assumes the standard HTTPS port of 443 and version 18
+        /// </summary>
+        /// <param name="dnsName"></param>
+        /// <param name="theAccount"></param>
+        /// <param name="thePW"></param>
+        /// <param name="timeOut"></param>
+        public FMS18(string dnsName, string theAccount, string thePW, int timeOut) : base(dnsName, 443, theAccount, thePW, timeOut, 18)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMS"/> class.
+        /// Assumes the standard HTTPS port of 443
+        /// </summary>
+        /// <param name="dnsName"></param>
+        /// <param name="theAccount"></param>
+        /// <param name="thePW"></param>
+        /// <param name="timeOut"></param>
+        /// <param name="version"></param>
+        public FMS18(string dnsName, string theAccount, string thePW, int timeOut, int version) : base(dnsName, 443, theAccount, thePW, timeOut, version)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FMS"/> class.
+        /// Assumes default port 443 and default timeout 100 secs or 100,000ms, and version 18
+        /// </summary>
+        /// <param name="dnsName"></param>
+        /// <param name="theAccount"></param>
+        /// <param name="thePW"></param>
+        /// <param name="version"></param>
+        public FMS18(string dnsName, string theAccount, string thePW) : base(dnsName, 443, theAccount, thePW, 100000, 18)
         {
         }
 

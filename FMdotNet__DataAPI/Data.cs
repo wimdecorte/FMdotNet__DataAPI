@@ -43,20 +43,9 @@ namespace FMdotNet__DataAPI
             rawJson = json.ToString();
             JArray dataArray;
 
-            if (json.Property("response") == null)
-            {
-                // 16
-                errorCode = (int)json["errorCode"];
-                result = (string)json["result"];
-                dataArray = (JArray)json["data"];
-            }
-            else
-            {
-                // 17 or later
-                errorCode = (int)json["messages"][0]["code"];
-                result = (string)json["messages"][0]["message"];
-                dataArray = (JArray)json["response"]["data"];
-            }
+            errorCode = (int)json["messages"][0]["code"];
+            result = (string)json["messages"][0]["message"];
+            dataArray = (JArray)json["response"]["data"];
 
             data = new FMData("parent");
 
