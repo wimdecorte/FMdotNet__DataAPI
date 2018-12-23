@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
-using System;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FMdotNet__DataAPI
 {
+    /// <summary>
+    /// as of yet unused - 20181221
+    /// </summary>
     internal class oAuthPayload
     {
         public string layout { get; private set; }
@@ -26,29 +26,45 @@ namespace FMdotNet__DataAPI
         }
     }
 
-    internal class AuthResponse
+    public class ReceivedMessages
     {
-        public string errorCode { get; set; }
-        public string layout { get; set; }
-        public string token { get; set; }
+        public Message[] messages { get; set; }
     }
 
-    internal class ErrorCodeOnlyResponse
+    public class ReceivedToken : ReceivedMessages
     {
-        public string errorCode { get; set; }
+        [JsonProperty("response")]
+        public Response ResponseToken { get; set; }
+
     }
 
     /// <summary>
     /// Represents the json received from FMS
     /// </summary>
-    public class Received
+    public class Received : ReceivedMessages
     {
-        public Response response { get; set; }
-        public Message[] messages { get; set; }
+        /*
+        // needs a constructor to deal with the unknown json object that may be teh value of the response property/key
+        public Received(JObject response)
+        {
+
+        }
+        */
+
+            /// <summary>
+            /// Represents the response node in the json received from FMS
+            /// </summary>
+        [JsonProperty("response")]
+        public Response Response { get; set; }
+       
     }
 
+    /// <summary>
+    /// Represents the response key of the json received from FMS,  holds a great many things depending on the type of the call made
+    /// </summary>
     public class Response
     {
+ 
         public DataAPIinfo productinfo { get; set; }
 
         [JsonProperty("databases")]
@@ -71,7 +87,8 @@ namespace FMdotNet__DataAPI
         public string recordId { get; set; }
         public string modId { get; set; }
 
-        public string token { get; set; }
+        [JsonProperty("token")]
+        public string Token { get; set; }
 
         public string scriptError { get; set; }
 
@@ -80,62 +97,44 @@ namespace FMdotNet__DataAPI
 
         [JsonProperty("scriptError.prerequest")]
         public string scriptErrorPreRequest { get; set; }
+
+        public ResponseData data { get; set; }
     }
 
+    /// <summary>
+    /// The FMS json holds an array of messages like this - usually only one message through
+    /// </summary>
     public class Message
     {
         public string code { get; set; }
         public string message { get; set; }
     }
 
-    // -------
-
-
+ 
     public class ResponseData
     {
-        public RecordData[] data { get; set; }
+        public Record[] records { get; set; }
     }
 
-    public class RecordData
+    public class Record
     {
-        public Fielddata fieldData { get; set; }
-        public Portaldata portalData { get; set; }
+        public Record(JObject fieldData, JObject portalData)
+        {
+            // constructor to parse the field and portal data
+            // the rest of the json data will get de-serialized by the matching json key (property) names
+
+        }
+
+        public List<Field> fields { get; private set; }
+
+
         public string recordId { get; set; }
         public string modId { get; set; }
-    }
 
-    public class Fielddata
-    {
-        public string cake { get; set; }
-        public string wine_pairing { get; set; }
-        public string country { get; set; }
-        public int record_id { get; set; }
-        public string cake_FRUIT__number__acfruit { get; set; }
-        public string cake_FRUIT__number__acrecord_id { get; set; }
-    }
-
-    public class Portaldata
-    {
-        public Cake_FRUIT__Ac[] cake_FRUIT__ac { get; set; }
-        public Same_Country[] same_country { get; set; }
-    }
-
-    public class Cake_FRUIT__Ac
-    {
-        public int recordId { get; set; }
-        public string cake_FRUIT__acfruit { get; set; }
-        public string cake_FRUIT__accountry { get; set; }
-        public int cake_FRUIT__acrecord_id { get; set; }
-        public string cake_FRUIT__acnumber_field { get; set; }
-        public string modId { get; set; }
-    }
-
-    public class Same_Country
-    {
-        public int recordId { get; set; }
-        public string cake_CAKE__sameCountrycake { get; set; }
-        public int cake_CAKE__sameCountryrecord_id { get; set; }
-        public string modId { get; set; }
+        /// <summary>
+        /// for each portal and related record, the info on the TO and table of the related data, found count and returned count
+        /// </summary>
+        public RelatedSet[] relatedSet { get; set; }
     }
 
     /// <summary>
@@ -212,6 +211,15 @@ namespace FMdotNet__DataAPI
 
     public class ResultSet
     {
+        public int foundCount { get; set; }
+        public int returnedCount { get; set; }
+    }
+
+
+    public class RelatedSet
+    {
+        public string database { get; set; }
+        public string table { get; set; }
         public int foundCount { get; set; }
         public int returnedCount { get; set; }
     }

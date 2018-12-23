@@ -108,7 +108,7 @@ namespace FMdotNet__DataAPI
             {
                 var received = JsonConvert.DeserializeObject<Received>(resultJson);
                 code = Convert.ToInt32(received.messages[0].code);
-                SetLastError(code, received.messages[0].message, received.response);
+                SetLastError(code, received.messages[0].message, received.Response);
             }
             else
             {
@@ -179,7 +179,7 @@ namespace FMdotNet__DataAPI
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
                 var received = JsonConvert.DeserializeObject<Received>(resultJson);
-                SetLastError( Convert.ToInt32(received.messages[0].code), received.messages[0].message, received.response);
+                SetLastError( Convert.ToInt32(received.messages[0].code), received.messages[0].message, received.Response);
             }
             else
             {
@@ -253,7 +253,7 @@ namespace FMdotNet__DataAPI
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
                 var received = JsonConvert.DeserializeObject<Received>(resultJson);
-                SetLastError(Convert.ToInt32(received.messages[0].code), received.messages[0].message, received.response);
+                SetLastError(Convert.ToInt32(received.messages[0].code), received.messages[0].message, received.Response);
             }
             else
             {
@@ -515,7 +515,7 @@ namespace FMdotNet__DataAPI
                     code = Convert.ToInt32(NonRecordResponse.messages[0].code);
 
                 string message = NonRecordResponse.messages[0].message;
-                fms.SetLastError(code, message, NonRecordResponse.response);
+                fms.SetLastError(code, message, NonRecordResponse.Response);
                 return NonRecordResponse;
             }
         }
@@ -612,7 +612,7 @@ namespace FMdotNet__DataAPI
 
                 ParseResponse(resultJson);
                 if (fms.lastErrorCode == 0)
-                    newRecordId = Convert.ToInt32(NonRecordResponse.response.recordId);
+                    newRecordId = Convert.ToInt32(NonRecordResponse.Response.recordId);
 
                 return newRecordId;
             }
@@ -690,7 +690,7 @@ namespace FMdotNet__DataAPI
 
                 NonRecordResponse=ParseResponse(resultJson);
                 if (NonRecordResponse.messages[0].code == "0")
-                    newModificationId = Convert.ToInt32(NonRecordResponse.response.modId);
+                    newModificationId = Convert.ToInt32(NonRecordResponse.Response.modId);
                 else if (NonRecordResponse.messages[0].code == string.Empty || NonRecordResponse.messages[0].code == null)
                     NonRecordResponse.messages[0].code = "99999999999";
 
@@ -1105,7 +1105,7 @@ namespace FMdotNet__DataAPI
                 }
                 else
                     received = new RecordsGetResponse(Convert.ToInt16(apiResponse.StatusCode), apiResponse.ReasonPhrase + " - FMS says: " + response.messages[0].message);
-                fms.SetLastError(code, message, response.response);
+                fms.SetLastError(code, message, response.Response);
 
                 return received;
             }

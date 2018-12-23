@@ -53,7 +53,7 @@ namespace FMdotNet__DataAPI
         /// <summary>
         /// Represents the currently selected layout, set by SetLayout method.
         /// </summary>
-		public string CurrentLayout { get; private set; }
+		public string CurrentLayout { get; protected set; }
 
         /// <summary>
         /// The shared URL for all the of the requests.
@@ -63,7 +63,7 @@ namespace FMdotNet__DataAPI
         /// <summary>
         /// The FileMaker account name to use in the authentication request
         /// </summary>
-		public string FMAccount { get; private set; }
+		public string FMAccount { get; protected set; }
 
         /// <summary>
         /// The FileMaker password to use in the authentication request
@@ -73,7 +73,7 @@ namespace FMdotNet__DataAPI
         /// <summary>
         /// The folder where fmdotNet will save container data to.
         /// </summary>
-        public string DownLoadFolder { get; private set; }
+        public string DownLoadFolder { get; protected set; }
 
         //public int TotalRecords { get; private set; } // not sure we can get this except by all records
 
@@ -81,7 +81,7 @@ namespace FMdotNet__DataAPI
         /// The token that FileMaker Server generates after a successful authentication call.
         /// It is valid for 15 minutes after the last call to the API.
         /// </summary>
-        internal string token { get; private set; }
+        protected string token { get; set; }
 
         /// <summary>
         /// Class for all requests that create new records
@@ -101,27 +101,27 @@ namespace FMdotNet__DataAPI
         /// <summary>
         /// The FileMaker error code from the last call made.
         /// </summary>
-        public int lastErrorCode { get; private set; }
+        public int lastErrorCode { get; protected set; }
 
         /// <summary>
         /// The FileMaker error code from the last script executed after the Data API call.
         /// </summary>
-        public int lastErrorCodeScript { get; private set; }
+        public int lastErrorCodeScript { get; protected set; }
 
         /// <summary>
         /// The FileMaker error code from the last script executed after the Data API call but before the sort.
         /// </summary>
-        public int lastErrorCodeScriptPreSort { get; private set; }
+        public int lastErrorCodeScriptPreSort { get; protected set; }
 
         /// <summary>
         /// The FileMaker error code from the last script executed before the Data API call.
         /// </summary>
-        public int lastErrorCodeScriptPreRequest { get; private set; }
+        public int lastErrorCodeScriptPreRequest { get; protected set; }
 
         /// <summary>
         /// The FileMaker error message associated with the last error.
         /// </summary>
-        public string lastErrorMessage { get; private set; }
+        public string lastErrorMessage { get; protected set; }
 
 
 
@@ -134,6 +134,10 @@ namespace FMdotNet__DataAPI
          * - use serialization on the FMdata classes DataContract/DataMember vs Serializable
          * - beef up error handling, for instance when passing empty field values   
          * - refactor for camelcase on variables?
+         * 
+         * - add modId as a parameter where possible
+         * - add the 18-specific things to the FMS18 class - or use a vX naming instead of FMS version numbering
+         * - user deserialziation using the classes in Response.cs instead of reading through the json like in RecordGetResponse
          * */
 
         /// <summary>
@@ -265,17 +269,20 @@ namespace FMdotNet__DataAPI
             
             url = BaseUrl + "databases/" + CurrentDatabase + "/sessions";
             var byteArray = Encoding.ASCII.GetBytes(FMAccount + ":" + FMPassword);
-            webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+            var sig = Convert.ToBase64String(byteArray);
+            webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", sig);
 
+            var content = new StringContent("{}", Encoding.UTF8, "application/json");
 
             try
             {
                 HttpResponseMessage response = null;
 
                 // empty json as the body as per the api documentation, probably works without a body too as per my Postman testing
-                response = await webClient.PostAsync(url, new StringContent("{}", Encoding.UTF8, "application/json"));
 
-               
+                // works in 17 but not 18
+                response = await webClient.PostAsync(url, content);
+
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     // get the json from the response body
@@ -299,7 +306,7 @@ namespace FMdotNet__DataAPI
                     Received received = JsonConvert.DeserializeObject<Received>(resultJson);
                     if(received.messages[0].code == "0")
                     {
-                        token = received.response.token;
+                        token = received.Response.Token;
 
                         // clear the default headers to get rid of the auth header since we'll be re-using webclient
                         webClient.DefaultRequestHeaders.Clear();
@@ -307,6 +314,12 @@ namespace FMdotNet__DataAPI
                         // add the new header
                         webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                     }
+                }
+                else
+                {
+                    resultJson = await response.Content.ReadAsStringAsync();
+                    Received received = JsonConvert.DeserializeObject<Received>(resultJson);
+                    this.lastErrorCode = Convert.ToInt16(received.messages[0].code);
                 }
             }
             catch(Exception ex)
@@ -321,7 +334,7 @@ namespace FMdotNet__DataAPI
         /// Logs out of the session and invalidates the token.
         /// </summary>
         /// <returns>error code, 0 if no error.</returns>
-        public async System.Threading.Tasks.Task<int> Logout()
+        public async Task<int> Logout()
         {
             int errorCode = 0;
             string url = string.Empty;
@@ -611,58 +624,6 @@ namespace FMdotNet__DataAPI
 
     }
 
-    public partial class FMS18 : FMS
-    {
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FMS"/> class.
-        /// Assumes version 17 or higher
-        /// </summary>
-        /// <param name="dnsName"></param>
-        /// <param name="theAccount"></param>
-        /// <param name="thePW"></param>
-        /// <param name="timeOut"></param>
-        public FMS18(string dnsName, int httpsPort, string theAccount, string thePW, int timeOut) : base(dnsName, httpsPort, theAccount, thePW, timeOut, 18)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FMS"/> class.
-        /// Assumes the standard HTTPS port of 443 and version 18
-        /// </summary>
-        /// <param name="dnsName"></param>
-        /// <param name="theAccount"></param>
-        /// <param name="thePW"></param>
-        /// <param name="timeOut"></param>
-        public FMS18(string dnsName, string theAccount, string thePW, int timeOut) : base(dnsName, 443, theAccount, thePW, timeOut, 18)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FMS"/> class.
-        /// Assumes the standard HTTPS port of 443
-        /// </summary>
-        /// <param name="dnsName"></param>
-        /// <param name="theAccount"></param>
-        /// <param name="thePW"></param>
-        /// <param name="timeOut"></param>
-        /// <param name="version"></param>
-        public FMS18(string dnsName, string theAccount, string thePW, int timeOut, int version) : base(dnsName, 443, theAccount, thePW, timeOut, version)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FMS"/> class.
-        /// Assumes default port 443 and default timeout 100 secs or 100,000ms, and version 18
-        /// </summary>
-        /// <param name="dnsName"></param>
-        /// <param name="theAccount"></param>
-        /// <param name="thePW"></param>
-        /// <param name="version"></param>
-        public FMS18(string dnsName, string theAccount, string thePW) : base(dnsName, 443, theAccount, thePW, 100000, 18)
-        {
-        }
-
-    }
 
     /// <summary>
     /// Represents a FileMaker script to execute.
