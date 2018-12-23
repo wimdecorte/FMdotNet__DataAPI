@@ -221,8 +221,8 @@ namespace FMdotNet__DataAPI
                 if (HttpResponse.StatusCode == HttpStatusCode.OK)
                 {
                     // instead of doing this, it would be better to deserialize --> but not ready yet to deal with the json in response property
-                    JObject o = JObject.Parse(resultJson);
-                    string productJson = (string)o["response"];
+                    JObject jsonObject = JObject.Parse(resultJson);
+                    var productJson = jsonObject["response"];
 
                     // product info is a json object as the value of the response key
                     // body will also contain an error code :
@@ -238,7 +238,8 @@ namespace FMdotNet__DataAPI
                         },
                         "messages": [
                     */
-                    info = JsonConvert.DeserializeObject<DataAPIinfo>(productJson);
+                    info = productJson.ToObject<DataAPIinfo>();
+                    //info = JsonConvert.DeserializeObject<DataAPIinfo>(productJson);
                     return info;
 
                 }
