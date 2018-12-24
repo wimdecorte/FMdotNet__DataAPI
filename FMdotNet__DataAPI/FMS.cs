@@ -454,9 +454,9 @@ namespace FMdotNet__DataAPI
         {
             lastErrorCode = code;
             lastErrorMessage = message;
-            lastErrorCodeScript = Convert.ToInt16(response.scriptError);
-            lastErrorCodeScriptPreRequest = Convert.ToInt16(response.scriptErrorPreRequest);
-            lastErrorCodeScriptPreSort = Convert.ToInt16(response.scriptErrorPreSort);
+            lastErrorCodeScript = Convert.ToInt16(response.ScriptError);
+            lastErrorCodeScriptPreRequest = Convert.ToInt16(response.ScriptErrorPreRequest);
+            lastErrorCodeScriptPreSort = Convert.ToInt16(response.ScriptErrorPreSort);
         }
 
         /// <summary>

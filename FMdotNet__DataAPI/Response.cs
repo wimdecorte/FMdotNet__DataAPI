@@ -65,7 +65,7 @@ namespace FMdotNet__DataAPI
     public class Response
     {
  
-        public DataAPIinfo productinfo { get; set; }
+        public DataAPIinfo Productinfo { get; set; }
 
         [JsonProperty("databases")]
         public FileMakerFile[] FMfiles { get; set; }
@@ -76,32 +76,48 @@ namespace FMdotNet__DataAPI
         [JsonProperty("scripts")]
         public FileMakerScript[] FMscripts { get; set; }
 
-
+        #region properties used in the layout details
         [JsonProperty("fieldMetaData")]
         public FieldMetaData[] FMfields { get; set; }
 
-        public DataSource dataSource { get; set; }
+        [JsonProperty("portalMetaData")]
+        public Dictionary<string, FieldMetaData[]> Portals { get; set; }
 
-        public ResultSet resultSet { get; set; }
+        
+        [JsonProperty("valueLists")]
+        public FileMakerValueList[] ValueLists { get; set; }
 
-        public string recordId { get; set; }
-        public string modId { get; set; }
+        #endregion
+
+        [JsonProperty("dataSource")]
+        public DataSource DataSource { get; set; }
+
+        [JsonProperty("resultSet")]
+        public ResultSet ResultSet { get; set; }
+
+        [JsonProperty("recordId")]
+        public string RecordId { get; set; }
+
+        [JsonProperty("modId")]
+        public string ModId { get; set; }
 
         [JsonProperty("token")]
         public string Token { get; set; }
 
-        public string scriptError { get; set; }
+        [JsonProperty("scriptError")]
+        public string ScriptError { get; set; }
 
         [JsonProperty("scriptError.presort")]
-        public string scriptErrorPreSort { get; set; }
+        public string ScriptErrorPreSort { get; set; }
 
         [JsonProperty("scriptError.prerequest")]
-        public string scriptErrorPreRequest { get; set; }
+        public string ScriptErrorPreRequest { get; set; }
 
-        public ResponseData data { get; set; }
+        [JsonProperty("data")]
+        public ResponseData Data { get; set; }
     }
 
-    /// <summary>
+     /// <summary>
     /// The FMS json holds an array of messages like this - usually only one message through
     /// </summary>
     public class Message
@@ -126,8 +142,6 @@ namespace FMdotNet__DataAPI
         }
 
         public List<Field> fields { get; private set; }
-
-
         public string recordId { get; set; }
         public string modId { get; set; }
 
@@ -158,6 +172,15 @@ namespace FMdotNet__DataAPI
     public class FileMakerLayout
     {
         public string name { get; set; }
+    }
+
+    public class FileMakerLayoutDetails
+    {
+        public FieldMetaData[] Fields { get; set; }
+
+        public Dictionary<string, FieldMetaData[]> Portals { get; set; }
+
+        public FileMakerValueList[] ValueLists { get; set; }
     }
 
     public class FileMakerScript

@@ -612,7 +612,7 @@ namespace FMdotNet__DataAPI
 
                 ParseResponse(resultJson);
                 if (fms.lastErrorCode == 0)
-                    newRecordId = Convert.ToInt32(NonRecordResponse.Response.recordId);
+                    newRecordId = Convert.ToInt32(NonRecordResponse.Response.RecordId);
 
                 return newRecordId;
             }
@@ -690,7 +690,7 @@ namespace FMdotNet__DataAPI
 
                 NonRecordResponse=ParseResponse(resultJson);
                 if (NonRecordResponse.messages[0].code == "0")
-                    newModificationId = Convert.ToInt32(NonRecordResponse.Response.modId);
+                    newModificationId = Convert.ToInt32(NonRecordResponse.Response.ModId);
                 else if (NonRecordResponse.messages[0].code == string.Empty || NonRecordResponse.messages[0].code == null)
                     NonRecordResponse.messages[0].code = "99999999999";
 

@@ -77,7 +77,6 @@ namespace FMdotNet__DataAPI
             {
                 HttpResponseMessage HttpResponse = null;
 
-                
                 // clear the default headers to get rid of the auth header
                 webClient.DefaultRequestHeaders.Clear();
 
@@ -98,9 +97,7 @@ namespace FMdotNet__DataAPI
                        {
                         "response": {
                             "databases": [
-                      
                      * */
-
                 }
             }
             catch (Exception ex)
@@ -113,30 +110,62 @@ namespace FMdotNet__DataAPI
             return files;
         }
 
-        private async Task<List<FileMakerLayout>> GetLayoutDetails(string layoutName)
+        public async Task<FileMakerLayoutDetails> GetLayoutDetails(string layoutName)
         {
+            ClearError();
+
             var url = BaseUrl + "databases/" + this.CurrentDatabase + "/layouts/" + layoutName;
-            var details = new List<FileMakerLayout>();
+            SetAuthHeader();
+
+            var details = new FileMakerLayoutDetails();
+
+            try
+            {
+                HttpResponseMessage HttpResponse = null;
+
+                HttpResponse = await webClient.GetAsync(url);
+                var resultJson = await HttpResponse.Content.ReadAsStringAsync();
+                var r = JsonConvert.DeserializeObject<Received>(resultJson);
+
+                if (HttpResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    details.Fields = r.Response.FMfields;
+                    details.Portals = r.Response.Portals;
+                    details.ValueLists = r.Response.ValueLists;
+                }
+                else
+                {
+                    SetFMSerror(r);
+                }
+            }
+            catch (Exception ex)
+            {
+                // set last error
+                SetUnexpectedError999(ex);
+            }
 
             return details;
         }
 
-        private async Task<List<FileMakerScript>> GetScript()
+        public async Task<List<FileMakerScript>> GetScripts()
         {
+            ClearError();
+
             var url = BaseUrl + "databases/" + this.CurrentDatabase + "/scripts";
             var scripts = new List<FileMakerScript>();
 
             try
             {
                 HttpResponseMessage HttpResponse = null;
+                SetAuthHeader();
 
                 // empty json as the body as per the api documentation, probably works without a body too as per my Postman testing
                 HttpResponse = await webClient.GetAsync(url);
                 var resultJson = await HttpResponse.Content.ReadAsStringAsync();
+                var r = JsonConvert.DeserializeObject<Received>(resultJson);
 
                 if (HttpResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    var r = JsonConvert.DeserializeObject<Received>(resultJson);
                     scripts = r.Response.FMscripts.ToList();
                     //
                     /*
@@ -152,18 +181,21 @@ namespace FMdotNet__DataAPI
                 else
                 {
                     // register error
+                    SetFMSerror(r);
                 }
             }
             catch (Exception ex)
             {
-
+                SetUnexpectedError999(ex);
             }
 
             return scripts;
         }
 
-        private async Task<List<FileMakerLayout>> GetLayoutsAsync()
+        public async Task<List<FileMakerLayout>> GetLayouts()
         {
+            ClearError();
+
             var url = BaseUrl + "databases/" + this.CurrentDatabase + "/layouts";
             var layouts = new List<FileMakerLayout>();
 
@@ -171,37 +203,66 @@ namespace FMdotNet__DataAPI
             {
                 HttpResponseMessage HttpResponse = null;
 
-                // empty json as the body as per the api documentation, probably works without a body too as per my Postman testing
+                SetAuthHeader();
+
                 HttpResponse = await webClient.GetAsync(url);
                 var resultJson = await HttpResponse.Content.ReadAsStringAsync();
+                var r = JsonConvert.DeserializeObject<Received>(resultJson);
 
                 if (HttpResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    var r = JsonConvert.DeserializeObject<Received>(resultJson);
                     layouts = r.Response.FMlayouts.ToList();
                     //
                     /*
-                       {
+                    {
                         "response": {
-                            "databases": [
-                      
+                            "layouts": [
+                                {
+                                    "name": "EMPTY"
+                                },
                      * */
                 }
                 else
                 {
                     // register error
+                    SetFMSerror(r);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-
+                SetUnexpectedError999(ex);
             }
 
             return layouts;
         }
 
+        private void SetUnexpectedError999(Exception ex)
+        {
+            this.lastErrorMessage = ex.InnerException.ToString();
+            this.lastErrorCode = 999;
+        }
+
+        private void SetFMSerror(Received r)
+        {
+            this.lastErrorMessage = r.messages[0].message;
+            this.lastErrorCode = Convert.ToInt32(r.messages[0].code);
+        }
+
+        private void SetAuthHeader()
+        {
+            webClient.DefaultRequestHeaders.Clear();
+            webClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+
+        private void ClearError()
+        {
+            this.lastErrorMessage = string.Empty;
+            this.lastErrorCode = 0;
+        }
+
         public async Task<DataAPIinfo> GetProductInfo()
         {
+            ClearError();
 
             // this call will always work even if there is no valid token
             // clear the default headers to get rid of the auth header
@@ -217,11 +278,11 @@ namespace FMdotNet__DataAPI
 
                 HttpResponse = await webClient.GetAsync(url);
                 var resultJson = await HttpResponse.Content.ReadAsStringAsync();
+                JObject jsonObject = JObject.Parse(resultJson);
 
                 if (HttpResponse.StatusCode == HttpStatusCode.OK)
                 {
                     // instead of doing this, it would be better to deserialize --> but not ready yet to deal with the json in response property
-                    JObject jsonObject = JObject.Parse(resultJson);
                     var productJson = jsonObject["response"];
 
                     // product info is a json object as the value of the response key
@@ -243,11 +304,14 @@ namespace FMdotNet__DataAPI
                     return info;
 
                 }
+                else
+                {
+                    SetFMSerror(jsonObject.ToObject<Received>());
+                }
             }
             catch(Exception ex)
             {
-                this.lastErrorMessage = ex.InnerException.ToString();
-                this.lastErrorCode = 999;
+                SetUnexpectedError999(ex);
             }
 
             return info;
@@ -257,6 +321,8 @@ namespace FMdotNet__DataAPI
         // not using the default FMS authenticate since FMS18 seems to work a bit differently
         public async Task<string> Authenticate()
         {
+            ClearError();
+
             token = "";
             string resultJson;
             string url = string.Empty;
@@ -270,9 +336,6 @@ namespace FMdotNet__DataAPI
             var request = new RestRequest(Method.POST);
             request.AddHeader("Authorization", "Basic " + sig);
             request.AddHeader("Content-Type", "application/json");
-            
-
-           
 
             try
             {
@@ -302,13 +365,14 @@ namespace FMdotNet__DataAPI
                 {
                     resultJson = response.Content;
                     Received received = JsonConvert.DeserializeObject<Received>(resultJson);
-                    this.lastErrorCode = Convert.ToInt16(received.messages[0].code);
+                    SetFMSerror(received);
                 }
             }
             catch (Exception ex)
             {
                 //If it fails it could be because of the TLS issue
                 token = "Error - " + ex.Message;
+                SetUnexpectedError999(ex);
             }
             return token;
         }

@@ -66,8 +66,41 @@ namespace XUnit_fmDotNet_DataAPI
             Assert.NotEqual(0, count);
         }
 
+        [Fact]
+        public async Task TestGetLayouts()
+        {
+            login();
+            List<FileMakerLayout> layouts = await fms.GetLayouts();
+            var count = layouts.Count;
+            logout();
 
+            Assert.NotEqual(0, count);
+        }
 
+        [Fact]
+        public async Task TestGetLayoutDetails()
+        {
+            login();
+            var layout = "FRUIT_utility";
+            var details = await fms.GetLayoutDetails(layout);
+            var countVLs = details.ValueLists.Length; // array
+            var countFields = details.Fields.Length; // array
+            var countPortals = details.Portals.Count; // dictionary
+            logout();
+
+            Assert.True(countFields > 0 && countPortals > 0 && countVLs > 0);
+        }
+
+        [Fact]
+        public async Task TestGetScripts()
+        {
+            login();
+            List<FileMakerScript> scripts = await fms.GetScripts();
+            var count = scripts.Count;
+            logout();
+
+            Assert.NotEqual(0, count);
+        }
 
         // starting its own FMS because we don't want it to interfere with the other tests
         [Fact]
