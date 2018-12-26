@@ -21,13 +21,13 @@ namespace XUnit_fmDotNet_DataAPI
 
         FMS18 fms = new FMS18(address, user, pw);
 
-        internal async void login()
+        internal async void Login()
         {
             fms.SetFile(file);
             token = await fms.Authenticate();
         }
 
-        internal async void logout()
+        internal async void Logout()
         {
             int result = await fms.Logout();
             token = string.Empty;
@@ -40,7 +40,7 @@ namespace XUnit_fmDotNet_DataAPI
             token = await fms.Authenticate();
             Console.Write(token);
             var tokenLength = token.Length;
-            Xunit.Assert.True(tokenLength > 10);
+            Xunit.Assert.True(tokenLength > 10 && token.Contains("error") == false);
         }
 
         [Fact]
@@ -69,10 +69,10 @@ namespace XUnit_fmDotNet_DataAPI
         [Fact]
         public async Task TestGetLayouts()
         {
-            login();
+            Login();
             List<FileMakerLayout> layouts = await fms.GetLayouts();
             var count = layouts.Count;
-            logout();
+            Logout();
 
             Assert.NotEqual(0, count);
         }
@@ -80,13 +80,13 @@ namespace XUnit_fmDotNet_DataAPI
         [Fact]
         public async Task TestGetLayoutDetails()
         {
-            login();
+            Login();
             var layout = "FRUIT_utility";
             var details = await fms.GetLayoutDetails(layout);
             var countVLs = details.ValueLists.Length; // array
             var countFields = details.Fields.Length; // array
             var countPortals = details.Portals.Count; // dictionary
-            logout();
+            Logout();
 
             Assert.True(countFields > 0 && countPortals > 0 && countVLs > 0);
         }
@@ -94,10 +94,10 @@ namespace XUnit_fmDotNet_DataAPI
         [Fact]
         public async Task TestGetScripts()
         {
-            login();
+            Login();
             List<FileMakerScript> scripts = await fms.GetScripts();
             var count = scripts.Count;
-            logout();
+            Logout();
 
             Assert.NotEqual(0, count);
         }
@@ -112,6 +112,21 @@ namespace XUnit_fmDotNet_DataAPI
             int result = await fms2.Logout();
 
             Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public async Task TestFindWildcard()
+        {
+            Login();
+            fms.SetLayout("FRUIT_utility");
+            var find = fms.FindRequest();
+            var request = find.SearchCriterium();
+            request.AddFieldSearch("country", "*");
+            var getFindResponse = await find.Execute();
+            Logout();
+
+            // default search with no other criteria returns 100 records
+            Assert.True(getFindResponse.errorCode == 0 && getFindResponse.recordCount == 100);
         }
     }
 }
