@@ -114,7 +114,7 @@ namespace FMdotNet__DataAPI
         public string ScriptErrorPreRequest { get; set; }
 
         [JsonProperty("data")]
-        public ResponseData Data { get; set; }
+        public Record[] Records { get; set; }
     }
 
      /// <summary>
@@ -126,29 +126,25 @@ namespace FMdotNet__DataAPI
         public string message { get; set; }
     }
 
- 
-    public class ResponseData
-    {
-        public Record[] records { get; set; }
-    }
-
     public class Record
     {
-        public Record(JObject fieldData, JObject portalData)
-        {
-            // constructor to parse the field and portal data
-            // the rest of the json data will get de-serialized by the matching json key (property) names
+        [JsonProperty("fieldData")]
+        public Dictionary<string, string> FieldData { get; set; }
 
-        }
+        [JsonProperty("portalData")]
+        public Dictionary<string, Dictionary<string, string>[]> PortalData { get; set; }
 
-        public List<Field> fields { get; private set; }
-        public string recordId { get; set; }
-        public string modId { get; set; }
+        [JsonProperty("recordId")]
+        public string RecordId { get; set; }
 
+        [JsonProperty("modId")]
+        public string ModId { get; set; }
+
+        [JsonProperty("relatedSet")]
         /// <summary>
         /// for each portal and related record, the info on the TO and table of the related data, found count and returned count
         /// </summary>
-        public RelatedSet[] relatedSet { get; set; }
+        public RelatedSet[] RelatedResultSet { get; set; }
     }
 
     /// <summary>

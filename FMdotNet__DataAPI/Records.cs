@@ -887,7 +887,8 @@ namespace FMdotNet__DataAPI
                 // if there is no query part then use Get
                 // if there is a query part then use Post and the sort also has to go in the body json payload
 
-                HttpResponseMessage apiResponse;
+                //HttpResponseMessage apiResponse;
+                IRestResponse apiResponse;
                 string resultJsonString;
 
                 if (requests.Count == 0 || recordId > 0)
@@ -959,7 +960,13 @@ namespace FMdotNet__DataAPI
                         url = url + "?" + string.Join("&", pieces.ToArray());
 
                     // using GET
-                    apiResponse = await webClient.GetAsync(url);
+                    //apiResponse = await webClient.GetAsync(url);
+
+                    var client = new RestClient(url);
+                    var request = new RestRequest(Method.GET);
+                    request.AddHeader("Authorization", "Bearer " + fms.token);
+
+                    apiResponse = client.Execute(request);
                 }
                 else
                 {
@@ -990,10 +997,10 @@ namespace FMdotNet__DataAPI
                         queries.Add(group);
                     }
                     // add the query key and it's array of requests to the json
-                    payloadJson.Add("query" , queries);
+                    payloadJson.Add("query", queries);
 
                     // add the sorts
-                    if(sorts != null && sorts.Count > 0)
+                    if (sorts != null && sorts.Count > 0)
                     {
                         JArray allSorts = new JArray();
                         foreach (SortInstruction s in sorts)
@@ -1006,10 +1013,10 @@ namespace FMdotNet__DataAPI
                         payloadJson.Add("sort", allSorts);
                     }
 
-                    if(howManyRecords > 0)
+                    if (howManyRecords > 0)
                         payloadJson.Add("range", howManyRecords.ToString());
 
-                    if(startRecord > 1)
+                    if (startRecord > 1)
                         payloadJson.Add("offset", startRecord.ToString());
 
                     if (responseLayout != string.Empty)
@@ -1062,7 +1069,7 @@ namespace FMdotNet__DataAPI
                     // handle the portals, the offset and range for each portal requires the key name to
                     // be the name of the portal
 
-                    if (portals !=null && portals.Count > 0)
+                    if (portals != null && portals.Count > 0)
                     {
                         JArray portalNames = new JArray();
                         //string[] portalNames = new string[portals.Length];
@@ -1070,23 +1077,29 @@ namespace FMdotNet__DataAPI
                         {
                             string pName = p.portalName;
                             portalNames.Add(pName);
-                            if(p.howManyRecords > 0)
+                            if (p.howManyRecords > 0)
                                 payloadJson.Add("limit." + pName, p.howManyRecords);
                             if (p.startRecord > 1)
                                 payloadJson.Add("offset." + pName, p.startRecord);
                         }
                         // add the names of the portals
-                        payloadJson.Add("portal" , portalNames);
+                        payloadJson.Add("portal", portalNames);
                     }
 
-                    string body = payloadJson.ToString();
+                    string body = payloadJson.ToString(Formatting.None);
 
                     // POST the payload
-                    apiResponse = await webClient.PostAsync(url, new StringContent(body, Encoding.UTF8, "application/json"));
+                    // apiResponse = await webClient.PostAsync(url, new StringContent(body, Encoding.UTF8, "application/json"));
+
+                    RestClient client;
+                    RestRequest request;
+                    PrepRestClientPOST(url, body, out client, out request);
+
+                    apiResponse = client.Execute(request);
                 }
 
                 // work with the response
-                resultJsonString = await apiResponse.Content.ReadAsStringAsync();
+                resultJsonString = apiResponse.Content;
                 JObject resultJson = JObject.Parse(resultJsonString);
 
 
@@ -1104,10 +1117,20 @@ namespace FMdotNet__DataAPI
                     received = new RecordsGetResponse(resultJson);
                 }
                 else
-                    received = new RecordsGetResponse(Convert.ToInt16(apiResponse.StatusCode), apiResponse.ReasonPhrase + " - FMS says: " + response.messages[0].message);
+                    received = new RecordsGetResponse(Convert.ToInt16(apiResponse.StatusCode), apiResponse.ErrorMessage + " - FMS says: " + response.messages[0].message);
                 fms.SetLastError(code, message, response.Response);
 
                 return received;
+            }
+
+            private void PrepRestClientPOST(string endpointUrl, string body, out RestClient client, out RestRequest request)
+            {
+                client = new RestClient(endpointUrl);
+                request = new RestRequest(Method.POST);
+                request.AddHeader("Authorization", "Bearer " + fms.token);
+                request.AddHeader("Content-Type", "application/json");
+                request.RequestFormat = DataFormat.Json;
+                request.AddParameter("application/json", body, ParameterType.RequestBody);
             }
 
             /// <summary>
