@@ -473,6 +473,13 @@ namespace FMdotNet__DataAPI
             lastErrorCodeScriptPreSort = 0;
         }
 
+        private void SetLastScriptErrors(Received received)
+        {
+            lastErrorCodeScript = Convert.ToInt32(received.Response.ScriptError);
+            lastErrorCodeScriptPreRequest = Convert.ToInt32(received.Response.ScriptErrorPreRequest);
+            lastErrorCodeScriptPreSort = Convert.ToInt32(received.Response.ScriptErrorPreSort);
+        }
+
         /// <summary>
         /// Modify the request to add teh calls to the FM scripts.
         /// </summary>

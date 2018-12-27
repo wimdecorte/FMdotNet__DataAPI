@@ -1014,7 +1014,7 @@ namespace FMdotNet__DataAPI
                     }
 
                     if (howManyRecords > 0)
-                        payloadJson.Add("range", howManyRecords.ToString());
+                        payloadJson.Add("limit", howManyRecords.ToString());
 
                     if (startRecord > 1)
                         payloadJson.Add("offset", startRecord.ToString());

@@ -126,7 +126,103 @@ namespace XUnit_fmDotNet_DataAPI
             Logout();
 
             // default search with no other criteria returns 100 records
-            Assert.True(getFindResponse.errorCode == 0 && getFindResponse.recordCount == 100);
+            Assert.True(getFindResponse.ErrorCode == 0 && getFindResponse.recordCount == 100);
+        }
+
+        [Fact]
+        public async Task TestDataSourcePopulated()
+        {
+            var targetLayout = "FRUIT_utility";
+
+            Login();
+            fms.SetLayout(targetLayout);
+            var find = fms.FindRequest();
+            var request = find.SearchCriterium();
+            request.AddFieldSearch("country", "==Belgium");
+            var getFindResponse = await find.Execute();
+            Logout();
+
+            // default search with no other criteria returns 100 records
+            Assert.True(getFindResponse.ErrorCode == 0 && getFindResponse.SourceInfo.layout == targetLayout);
+        }
+
+        [Fact]
+        public async Task TestResultSetPopulated()
+        {
+            var targetLayout = "FRUIT_utility";
+
+            Login();
+            fms.SetLayout(targetLayout);
+            var find = fms.FindRequest();
+            var request = find.SearchCriterium();
+            request.AddFieldSearch("country", "==Belgium");
+            var getFindResponse = await find.Execute();
+            Logout();
+
+            // default search with no other criteria returns 100 records
+            Assert.True(getFindResponse.ErrorCode == 0 && getFindResponse.NumberOfRecords.foundCount > 0);
+        }
+
+        [Fact]
+        public async Task TestRelatedResultSetPopulated()
+        {
+            var targetLayout = "FRUIT_utility";
+
+            Login();
+            fms.SetLayout(targetLayout);
+            var find = fms.FindRequest();
+            var request = find.SearchCriterium();
+            request.AddFieldSearch("country", "==Belgium");
+            var getFindResponse = await find.Execute();
+            Logout();
+
+            // default search with no other criteria returns 100 records
+            Assert.True(getFindResponse.ErrorCode == 0 && getFindResponse.data.foundSet.records[0].RelatedSourceInfo[0].database == "the_Data");
+        }
+
+        [Fact]
+        public async Task TestFindWithScripts()
+        {
+            var targetLayout = "FRUIT_utility";
+
+            Login();
+            fms.SetLayout(targetLayout);
+            var find = fms.FindRequest();
+            var request = find.SearchCriterium();
+            request.AddFieldSearch("country", "==Belgium");
+            find.AddScript(ScriptTypes.before, "log", "parameter added, before request");
+            find.AddScript(ScriptTypes.beforeSort, "log", "parameter added, before sort");
+            find.AddScript(ScriptTypes.after, "log", "parameter added, after request");
+            var getFindResponse = await find.Execute();
+            Logout();
+
+            // default search with no other criteria returns 100 records
+            Assert.True(getFindResponse.ErrorCode == 0 &&
+                getFindResponse.NumberOfRecords.foundCount > 0 &&
+                getFindResponse.ErrorCodeScriptBefore == 0 &&
+                getFindResponse.ErrorCodeScriptBeforeSort == 0 &&
+                getFindResponse.ErrorCodeScriptAfter == 0
+                );
+        }
+
+        [Fact]
+        public async Task TestOffsetAndLimit()
+        {
+            var targetLayout = "FRUIT_utility";
+
+            Login();
+            fms.SetLayout(targetLayout);
+            var find = fms.FindRequest();
+            var request = find.SearchCriterium();
+            request.AddFieldSearch("country", "==Belgium");
+            find.SetStartRecord(10);
+            find.SetHowManyRecords(1);
+            var getFindResponse = await find.Execute();
+            Logout();
+
+            // default search with no other criteria returns 100 records
+            Assert.True(getFindResponse.ErrorCode == 0 &&
+                getFindResponse.NumberOfRecords.returnedCount == 1 );
         }
     }
 }
