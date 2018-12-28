@@ -104,7 +104,7 @@ namespace FMdotNet__DataAPI
             {
                 // set last error
                 this.lastErrorCode = 999;
-                this.lastErrorMessage = ex.InnerException.ToString();
+                if (ex.InnerException != null) this.lastErrorMessage = ex.InnerException.ToString();
             }
 
             return files;
@@ -238,7 +238,7 @@ namespace FMdotNet__DataAPI
 
         private void SetUnexpectedError999(Exception ex)
         {
-            this.lastErrorMessage = ex.InnerException.ToString();
+            if (ex.InnerException != null) this.lastErrorMessage = ex.InnerException.ToString();
             this.lastErrorCode = 999;
         }
 

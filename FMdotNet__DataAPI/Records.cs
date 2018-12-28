@@ -62,7 +62,7 @@ namespace FMdotNet__DataAPI
 
                     using (var fileStream = File.Create(fileName))
                     {
-                        responseStream.CopyTo(fileStream);
+                        if (responseStream != null) responseStream.CopyTo(fileStream);
                     }
                     file = new FileInfo(fileName);
                     return file;
@@ -275,8 +275,7 @@ namespace FMdotNet__DataAPI
         /// <returns><see cref="RecordManipulationResponse"/> object.</returns>
         public async Task<int> SetSingleGlobalField(string fieldName, string TO, string value)
         {
-            List<Field> fields = new List<Field>();
-            fields.Add(new Field(fieldName, TO, 1, value, Version));
+            List<Field> fields = new List<Field> {new Field(fieldName, TO, 1, value, Version)};
             var received = await SetMultipleGlobalField(fields);
             return received;
         }
@@ -301,12 +300,12 @@ namespace FMdotNet__DataAPI
         // this class and the edit request class could probably benefit from a base class to inherit from
 
         /// <exclude />
-        public class RecordRequest
+        public class BaseRecordRequest
         {
 
             internal List<Field> fields { get; set; }
             internal List<KeyValuePair<string, string>> fieldKeyValuePairs { get; set; }
-            internal string sessionToken { get; set; }
+            // internal string sessionToken { get; set; }
             internal string url { get; set; }
             internal string endpoint { get; set; }
             internal int modificationId { get; set; }
@@ -321,11 +320,15 @@ namespace FMdotNet__DataAPI
             //public int errorCode { get; internal set; }
             //public string errorMessage { get; set; }
             /// <exclude />
-            public RecordManipulationResponse response { get; internal set; }
-            public Received NonRecordResponse { get; internal set; }
+            // public RecordManipulationResponse response { get; internal set; }
+
+            /// <summary>
+            /// Represents the json returned from FMS
+            /// </summary>
+            public Received Reply { get; internal set; }
 
             // constructor
-            internal RecordRequest(FMS fileMakerServer)
+            internal BaseRecordRequest(FMS fileMakerServer)
             {
                 // sessionToken = fileMakerServer.token;
                 fields = new List<Field>();
@@ -337,7 +340,7 @@ namespace FMdotNet__DataAPI
                 url = fileMakerServer.BaseUrl + endpoint;
             }
 
-            internal RecordRequest(FMS fileMakerServer, int modId) : this(fileMakerServer)
+            internal BaseRecordRequest(FMS fileMakerServer, int modId) : this(fileMakerServer)
             {
                 modificationId = modId;
             }
@@ -416,8 +419,33 @@ namespace FMdotNet__DataAPI
 
             #endregion
 
-            // 'AddRelatedField' overloads
-            #region AddRelatedFieldOverloads
+
+            public void AddRelatedField(string name, string TO, string value)
+            {
+                var fmField = new Field(name, TO, null, value, null,  fms.Version, string.Empty);
+                populateLists(fmField);
+            }
+
+            public void AddRelatedField(string name, string TO, string value, string portalName)
+            {
+                var fmField = new Field(name, TO, null, value, null,  fms.Version, portalName);
+                populateLists(fmField);
+            }
+
+            public void AddRelatedField(string name, string TO, int repetition, string value)
+            {
+                var fmField = new Field(name, TO, repetition, value, null,  fms.Version, string.Empty);
+                populateLists(fmField);
+            }
+
+            public void AddRelatedField(string name, string TO, int repetition, string value, string portalName)
+            {
+                var fmField = new Field(name, TO, repetition, value, null, fms.Version, portalName);
+                populateLists(fmField);
+            }
+
+            // 'ModifyRelatedField' overloads
+            #region ModifyRelatedFieldOverloads
 
             /// <summary>
             /// Adds a related field to the request.
@@ -427,7 +455,7 @@ namespace FMdotNet__DataAPI
             /// <param name="repetition">The repetition number.</param>
             /// <param name="value">The field value.</param>
             /// <param name="relatedRecordId">The record Id.</param>
-            public void AddRelatedField(string name, string TO, int repetition, string value, int relatedRecordId)
+            public void ModifyRelatedField(string name, string TO, int repetition, string value, int relatedRecordId)
             {
                 var fmField = new Field(name, TO, repetition, value, relatedRecordId, fms.Version, string.Empty);
                 populateLists(fmField);
@@ -442,7 +470,7 @@ namespace FMdotNet__DataAPI
             /// <param name="value">The field value.</param>
             /// <param name="relatedRecordId">The related record id.</param>
             /// <param name="portalName">Name of the portal.</param>
-            public void AddRelatedField(string name, string TO, int repetition, string value, int relatedRecordId, string portalName)
+            public void ModifyRelatedField(string name, string TO, int repetition, string value, int relatedRecordId, string portalName)
             {
                 var fmField = new Field(name, TO, repetition, value, relatedRecordId, fms.Version, portalName);
                 populateLists(fmField);
@@ -455,7 +483,7 @@ namespace FMdotNet__DataAPI
             /// <param name="TO">The table occurrence name / relationship name.</param>
             /// <param name="value">The field value.</param>
             /// <param name="relatedRecId">The related record Id.</param>
-            public void AddRelatedField(string name, string TO, string value, int relatedRecId)
+            public void ModifyRelatedField(string name, string TO, string value, int relatedRecId)
             {
                 var fmField = new Field(name, TO, 1, value, relatedRecId, fms.Version, string.Empty);
                 populateLists(fmField);
@@ -469,7 +497,7 @@ namespace FMdotNet__DataAPI
             /// <param name="value">The value.</param>
             /// <param name="relatedRecId">The related record identifier.</param>
             /// <param name="portalName">Name of the portal.</param>
-            public void AddRelatedField(string name, string TO, string value, int relatedRecId, string portalName)
+            public void ModifyRelatedField(string name, string TO, string value, int relatedRecId, string portalName)
             {
                 var fmField = new Field(name, TO, 1, value, relatedRecId, fms.Version, portalName);
                 populateLists(fmField);
@@ -507,22 +535,22 @@ namespace FMdotNet__DataAPI
             /// <exclude />
             internal Received ParseResponse(string json)
             {
-                NonRecordResponse = JsonConvert.DeserializeObject<Received>(json);
+                Reply = JsonConvert.DeserializeObject<Received>(json);
                 int code = 0;
-                if (NonRecordResponse.messages[0].code == null)
+                if (Reply.messages[0].code == null)
                     code = 9999;
                 else
-                    code = Convert.ToInt32(NonRecordResponse.messages[0].code);
+                    code = Convert.ToInt32(Reply.messages[0].code);
 
-                string message = NonRecordResponse.messages[0].message;
-                fms.SetLastError(code, message, NonRecordResponse.Response);
-                return NonRecordResponse;
+                string message = Reply.messages[0].message;
+                fms.SetLastError(code, message, Reply.Response);
+                return Reply;
             }
         }
 
 
         /// <exclude />
-        public class DeleteRecordRequest : RecordRequest
+        public class DeleteRecordRequest : BaseRecordRequest
         {
             private int recId { get; set; }
 
@@ -558,14 +586,14 @@ namespace FMdotNet__DataAPI
                 // doing a POST
                 var apiResponse = await webClient.PostAsync(url, body);
                 string resultJson = await apiResponse.Content.ReadAsStringAsync();
-                NonRecordResponse = JsonConvert.DeserializeObject<Received>(resultJson);
+                Reply = JsonConvert.DeserializeObject<Received>(resultJson);
 
-                return NonRecordResponse;
+                return Reply;
             }
         }
 
         /// <exclude />
-        public class EmptyRecordCreateRequest : RecordRequest
+        public class EmptyRecordCreateRequest : BaseRecordRequest
         {
 
             /// <exclude />
@@ -576,7 +604,7 @@ namespace FMdotNet__DataAPI
 
 
         /// <exclude />
-        public class RecordCreateRequest : RecordRequest
+        public class RecordCreateRequest : BaseRecordRequest
         {
             /// <exclude />
             public RecordCreateRequest(FMS fileMakerServer) : base(fileMakerServer)
@@ -612,7 +640,7 @@ namespace FMdotNet__DataAPI
 
                 ParseResponse(resultJson);
                 if (fms.lastErrorCode == 0)
-                    newRecordId = Convert.ToInt32(NonRecordResponse.Response.RecordId);
+                    newRecordId = Convert.ToInt32(Reply.Response.RecordId);
 
                 return newRecordId;
             }
@@ -621,9 +649,9 @@ namespace FMdotNet__DataAPI
         }
 
         /// <exclude />
-        public class RecordEditRequest : RecordRequest
+        public class RecordEditRequest : BaseRecordRequest
         {
-            private int parentRecordId;
+            private readonly int parentRecordId;
             private int newModificationId;
 
             #region RecordEditRequestOverloads
@@ -688,11 +716,11 @@ namespace FMdotNet__DataAPI
 
                 var reasonPhrase = apiResponse.StatusDescription;
 
-                NonRecordResponse=ParseResponse(resultJson);
-                if (NonRecordResponse.messages[0].code == "0")
-                    newModificationId = Convert.ToInt32(NonRecordResponse.Response.ModId);
-                else if (NonRecordResponse.messages[0].code == string.Empty || NonRecordResponse.messages[0].code == null)
-                    NonRecordResponse.messages[0].code = "99999999999";
+                Reply=ParseResponse(resultJson);
+                if (Reply.messages[0].code == "0")
+                    newModificationId = Convert.ToInt32(Reply.Response.ModId);
+                else if (Reply.messages[0].code == string.Empty || Reply.messages[0].code == null)
+                    Reply.messages[0].code = "99999999999";
 
                 return newModificationId;
             }

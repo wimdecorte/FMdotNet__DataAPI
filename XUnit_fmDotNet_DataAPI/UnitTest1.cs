@@ -3,6 +3,7 @@ using Xunit;
 using FMdotNet__DataAPI;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text;
 
 namespace XUnit_fmDotNet_DataAPI
 {
@@ -20,6 +21,21 @@ namespace XUnit_fmDotNet_DataAPI
         string file = "the_UI";
 
         FMS18 fms = new FMS18(address, user, pw);
+
+        internal string RandomString(int size, bool lowerCase)
+        {
+            StringBuilder builder = new StringBuilder();
+            Random random = new Random();
+            char ch;
+            for (int i = 0; i < size; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
+                builder.Append(ch);
+            }
+            if (lowerCase)
+                return builder.ToString().ToLower();
+            return builder.ToString();
+        }
 
         internal async void Login()
         {
@@ -222,7 +238,148 @@ namespace XUnit_fmDotNet_DataAPI
 
             // default search with no other criteria returns 100 records
             Assert.True(getFindResponse.ErrorCode == 0 &&
-                getFindResponse.NumberOfRecords.returnedCount == 1 );
+                getFindResponse.NumberOfRecords.returnedCount == 1);
+        }
+
+        [Fact]
+        public async Task TestGetRecords()
+        {
+            var targetLayout = "FRUIT_utility";
+
+            Login();
+            fms.SetLayout(targetLayout);
+            var find = fms.FindRequest();
+            find.SetStartRecord(10);
+            find.SetHowManyRecords(10);
+            find.AddScript(ScriptTypes.before, "log", "parameter added, before request");
+            find.AddScript(ScriptTypes.beforeSort, "log", "parameter added, before sort");
+            find.AddScript(ScriptTypes.after, "log", "parameter added, after request");
+            find.AddSortField("fruit", FMS.SortDirection.descend);
+            var getFindResponse = await find.Execute();
+            Logout();
+
+            // default search with no other criteria returns 100 records
+            Assert.True(getFindResponse.ErrorCode == 0 &&
+                getFindResponse.NumberOfRecords.returnedCount == 10 &&
+                getFindResponse.NumberOfRecords.foundCount > 0 &&
+                getFindResponse.ErrorCodeScriptBefore == 0 &&
+                getFindResponse.ErrorCodeScriptBeforeSort == 0 );
+        }
+
+        [Fact]
+        public async Task TestGetRecordById()
+        {
+            var targetLayout = "FRUIT_utility";
+
+            // assuming that the first record in that table is still the one with record id = 1
+            var targetId = 1;
+
+            Login();
+            fms.SetLayout(targetLayout);
+            var find = fms.FindRequest(targetId);
+
+            find.AddScript(ScriptTypes.before, "log", "parameter added, before request");
+            find.AddScript(ScriptTypes.beforeSort, "log", "parameter added, before sort");
+            find.AddScript(ScriptTypes.after, "log", "parameter added, after request");
+
+            var getFindResponse = await find.Execute();
+            Logout();
+
+            // default search with no other criteria returns 100 records
+            Assert.True(getFindResponse.ErrorCode == 0 &&
+                getFindResponse.NumberOfRecords.returnedCount == 1 &&
+                getFindResponse.data.foundSet.records[0].recordId == "1" &&
+                getFindResponse.NumberOfRecords.foundCount == 1 &&
+                getFindResponse.ErrorCodeScriptBefore == 0 &&
+                getFindResponse.ErrorCodeScriptBeforeSort == 0);
+        }
+
+        [Fact]
+        public async Task TestCreateRecord()
+        {
+            var targetLayout = "cake_utility";
+            Login();
+            fms.SetLayout(targetLayout);
+            var request = fms.NewRecordRequest();
+            request.AddField("cake", RandomString(50, false));
+            request.AddField("wine_pairing", RandomString(50, false));
+            request.AddField("country", RandomString(50, false));
+
+            // repeating field
+            request.AddField("repeating_field", "9", 2);
+
+            request.AddScript(ScriptTypes.before, "log", "parameter added, before request");
+            request.AddScript(ScriptTypes.beforeSort, "log", "parameter added, before sort");
+            request.AddScript(ScriptTypes.after, "log", "parameter added, after request");
+
+            var id = await request.Execute();
+
+            Logout();
+
+            // default search with no other criteria returns 100 records
+            Assert.True(request.Reply.messages[0].code == "0" && id > 0 && request.Reply.Response.ScriptError == "0");
+        }
+
+        [Fact]
+        public async Task TestCreateRecordWithRelatedData()
+        {
+            var targetLayout = "cake_utility";
+            Login();
+            fms.SetLayout(targetLayout);
+            var request = fms.NewRecordRequest();
+            request.AddField("cake", RandomString(50, false));
+            request.AddField("wine_pairing", RandomString(50, false));
+            request.AddField("country", RandomString(50, false));
+
+            // related field (will create releated record if relationship allows"
+            // request.AddField("cake_FRUIT__ac::fruit", "related - " + RandomString(50, true));
+
+            // but this is the preferred way
+            request.AddRelatedField("fruit", "cake_FRUIT__ac", "related - " + RandomString(15, true));
+
+            request.AddScript(ScriptTypes.before, "log", "parameter added, before request");
+            request.AddScript(ScriptTypes.beforeSort, "log", "parameter added, before sort");
+            request.AddScript(ScriptTypes.after, "log", "parameter added, after request");
+
+            var id = await request.Execute();
+
+            Logout();
+
+            // default search with no other criteria returns 100 records
+            Assert.True(request.Reply.messages[0].code == "0" && id > 0 && request.Reply.Response.ScriptError == "0");
+        }
+
+        [Fact]
+        public async Task TestModifyRecordWithRelatedData()
+        {
+            var targetLayout = "cake_utility";
+            Login();
+            fms.SetLayout(targetLayout);
+
+            // first create a record and capture the ids
+            var request = fms.NewRecordRequest();
+            request.AddField("cake", RandomString(50, false));
+            request.AddField("wine_pairing", "first value");
+            request.AddField("country", RandomString(50, false));
+            request.AddRelatedField("fruit", "cake_FRUIT__ac", "related - first value");
+            var id = await request.Execute();
+
+            // get the data for the new record so that we can get the related id
+            var find = fms.FindRequest(id);
+            var reply = await find.Execute();
+            var relatedId = reply.data.foundSet.records[0].relatedRecordSets[0].records[0].recordId;
+            var TOname = reply.data.relatedTableNames[0];
+            
+            // now  modify that record
+            var editRequest = fms.EditRequest(id);
+            editRequest.AddField("wine_pairing", "second value");
+            editRequest.ModifyRelatedField("fruit", TOname, "second value", Convert.ToInt32(relatedId));
+            var newModId = await editRequest.Execute();
+
+            Logout();
+
+            // the mod id returned from the edit should be 1 because it was a new record and this was the first edit
+            Assert.True((newModId == 1 && id > 0 && Convert.ToInt32(relatedId) > 0));
         }
     }
 }

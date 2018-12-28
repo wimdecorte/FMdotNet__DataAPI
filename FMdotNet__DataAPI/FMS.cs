@@ -215,7 +215,7 @@ namespace FMdotNet__DataAPI
                 Content = iContent
             };
 
-            HttpResponseMessage response = new HttpResponseMessage();
+            HttpResponseMessage response;
             // In case you want to set a timeout
             //CancellationToken cancellationToken = new CancellationTokenSource(60).Token;
 

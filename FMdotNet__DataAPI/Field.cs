@@ -32,7 +32,7 @@ namespace FMdotNet__DataAPI
         /// <param name="repetition">The repetition number.</param>
         /// <param name="value">The field value.</param>
         /// <param name="recId">The internal FileMaker  record Id.</param>
-        /// <param name="version">The version of FileMaker SErver</param>
+        /// <param name="version">The version of FileMaker Server</param>
         /// <param name="portalName">The name of the portal that contains this field</param>
         public Field(string name, string TO, int? repetition, string value, int? recId, int version, string portalName)
 		{
@@ -60,6 +60,7 @@ namespace FMdotNet__DataAPI
         /// Initializes a new instance of the <see cref="Field"/> class.
         /// </summary>
         /// <param name="name">The field name.</param>
+        /// <param name="version">The version of FileMaker Server</param>
         public Field(string name, int version) : this(name, "", 0, "", null, version, string.Empty)
         { }
         /// <summary>
@@ -67,6 +68,7 @@ namespace FMdotNet__DataAPI
         /// </summary>
         /// <param name="name">The field name.</param>
         /// <param name="value">The field value.</param>
+        /// <param name="version">The version of FileMaker Server</param>
         public Field(string name, string value, int version) : this(name, "", 0, value, null, version, string.Empty)
         { }
 
@@ -75,15 +77,17 @@ namespace FMdotNet__DataAPI
         /// </summary>
         /// <param name="name">The field name.</param>
         /// <param name="repetition">The repetition number.</param>
+        /// <param name="version">The version of FileMaker Server</param>
         public Field(string name, int repetition, int version) : this(name, "", repetition, "", null, version, string.Empty)
         { }
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Field"/> class.
         /// </summary>
         /// <param name="name">The field name.</param>
         /// <param name="repetition">The repetition number.</param>
         /// <param name="value">The field value.</param>
+        /// <param name="version">The version of FileMaker Server</param>
         public Field(string name, int repetition, string value, int version) : this(name, "", repetition, value, null, version, string.Empty)
         { }
 
@@ -94,6 +98,7 @@ namespace FMdotNet__DataAPI
         /// <param name="TO">The table occurance for the field.</param>
         /// <param name="repetition">The repetition number.</param>
         /// <param name="value">The field value.</param>
+        /// <param name="version">The version of FileMaker Server</param>
         public Field(string name,string TO, int repetition, string value, int version) : this(name, TO, repetition, value, null, version, string.Empty)
         { }
 
@@ -103,6 +108,7 @@ namespace FMdotNet__DataAPI
         /// <param name="name">The field name.</param>
         /// <param name="value">The field value.</param>
         /// <param name="recId">The internal FileMaker  record Id.</param>
+        /// <param name="version">The version of FileMaker Server</param>
         public Field( string name, string value, int recId, int version) : this(name, "", 0, value, recId, version, string.Empty)
         { }
 
@@ -113,6 +119,7 @@ namespace FMdotNet__DataAPI
         /// <param name="TO">The table occurance for the field.</param>
         /// <param name="value">The field value.</param>
         /// <param name="recId">The internal FileMaker  record Id.</param>
+        /// <param name="version">The version of FileMaker Server</param>
         public Field(string name, string TO, string value, int recId, int version) : this(name, TO, 0, value, version, recId, string.Empty)
         {}
 
@@ -123,7 +130,7 @@ namespace FMdotNet__DataAPI
         private string composeFullName()
 		{
 			string fullyQualifiedName = fieldName;
-			if (tableOccurance != null && tableOccurance.Length > 0)
+			if (!string.IsNullOrEmpty(tableOccurance))
 			{
 				fullyQualifiedName = tableOccurance + "::" + fieldName;
 			}

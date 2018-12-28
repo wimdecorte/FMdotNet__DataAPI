@@ -59,7 +59,7 @@ namespace FMdotNet__DataAPI
         
 
         /// <summary>
-        /// The FileMaker Data, in an <see cref="FMData"/ object>
+        /// The FileMaker Data, in an <see cref="FMData"/> object
         /// </summary>
         /// <remarks><see cref="FMData"/></remarks>
         public FMData data { get; private set; }
@@ -73,7 +73,6 @@ namespace FMdotNet__DataAPI
         internal RecordsGetResponse(JObject json)
         {
             rawJson = json.ToString();
-            JArray dataArray;
 
             var response = JsonConvert.DeserializeObject<Received>(rawJson);
             ErrorCodeScriptBefore = Convert.ToInt32(response.Response.ScriptErrorPreRequest);
@@ -83,9 +82,11 @@ namespace FMdotNet__DataAPI
             NumberOfRecords = response.Response.ResultSet;
             SourceInfo = response.Response.DataSource;
 
+            TotalFoundRecordCount = NumberOfRecords.foundCount;
+
             ErrorCode = (int)json["messages"][0]["code"];
             result = (string)json["messages"][0]["message"];
-            dataArray = (JArray)json["response"]["data"];
+            JArray dataArray = (JArray)json["response"]["data"];
 
             data = new FMData("parent");
 
@@ -144,7 +145,7 @@ namespace FMdotNet__DataAPI
                             // get rid of the TO name in the field
 
                             string fieldName = field.Name;
-                            string nameOnly = string.Empty;
+                            string nameOnly;
 
                             if (fieldName.Contains("::"))
                             {
