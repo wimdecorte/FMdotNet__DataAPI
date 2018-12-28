@@ -97,7 +97,7 @@ namespace FMdotNet__DataAPI
             
 
             // for 17+, add the portal data
-            if(relatedFields != null && relatedFields.Count > 0)
+            if(relatedFields.Count > 0)
             {
                 writer.WritePropertyName("portalData");
                 writer.WriteStartObject();

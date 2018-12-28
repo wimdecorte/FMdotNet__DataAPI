@@ -407,5 +407,41 @@ namespace XUnit_fmDotNet_DataAPI
             // the mod id returned from the edit should be 1 because it was a new record and this was the first edit
             Assert.True(newId == (id + 1) && errorCode == 0 && reply.Response.ScriptError == "0");
         }
+
+        [Fact]
+        public async Task TestDeleteRecord()
+        {
+            var targetLayout = "cake_utility";
+            Login();
+            fms.SetLayout(targetLayout);
+
+            // first create a record and capture the id
+            var request = fms.NewRecordRequest();
+            request.AddField("cake", RandomString(50, false));
+            var id = await request.Execute();
+
+            // duplicate that record
+            var dup = fms.DuplicateRquest(id);
+            var reply = await dup.Execute();
+            var dupId = Convert.ToInt32(reply.Response.RecordId);
+
+            // now  delete that record
+            // direct command, no need to first get the request and then execute it
+            // doesn't allow to run scripts
+            var deleteRecordResult = await fms.DeleteRecord(id);
+            
+
+            // delete the dup record but also run a script
+            var deleteRecord = fms.DeleteRequest(dupId);
+            deleteRecord.AddScript(ScriptTypes.after, "log", "some param after deleting record");
+            reply = await deleteRecord.Execute();
+
+            var errorCode = Convert.ToInt32(reply.messages[0].code);
+
+            Logout();
+
+            // the mod id returned from the edit should be 1 because it was a new record and this was the first edit
+            Assert.True(dupId == (id + 1) && deleteRecordResult == 0 && errorCode == 0 && reply.Response.ScriptError == "0");
+        }
     }
 }

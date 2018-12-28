@@ -548,18 +548,34 @@ namespace FMdotNet__DataAPI
             }
         }
 
+        /// <summary>
+        /// Deprecated - uses RecordDeleteRequest instead.
+        /// </summary>
+        public class DeleteRecordRequest : RecordDeleteRequest
+        {
+            private int recId { get; }
+            /// <summary>
+            /// Deprecated, use RecordDeleteRequest instead.
+            /// </summary>
+            /// <param name="fileMakerServer"></param>
+            /// <param name="recordId"></param>
+            public DeleteRecordRequest(FMS fileMakerServer, int recordId) : base(fileMakerServer, recordId)
+            {
+                recId = recordId;
+            }
+        }
 
         /// <exclude />
-        public class DeleteRecordRequest : BaseRecordRequest
+        public class RecordDeleteRequest : BaseRecordRequest
         {
-            private int recId { get; set; }
+            private int recId { get; }
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="DeleteRecordRequest"/> class.
+            /// Initializes a new instance of the <see cref="RecordDeleteRequest"/> class.
             /// </summary>
             /// <param name="fileMakerServer">The filemaker server.</param>
             /// <param name="recordId">The record id to delete</param>
-            public DeleteRecordRequest(FMS fileMakerServer, int recordId) : base(fileMakerServer)
+            public RecordDeleteRequest(FMS fileMakerServer, int recordId) : base(fileMakerServer)
             {
                 recId = recordId;
             }
@@ -574,8 +590,8 @@ namespace FMdotNet__DataAPI
                 string payloadJson = string.Empty;
 
                 url = fms.BaseUrl + "databases/" + fms.CurrentDatabase + "/layouts/" + fms.CurrentLayout + "/records/" + recId;
-                HttpContent body = new StringContent(payloadJson);
-                body.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                //HttpContent body = new StringContent(payloadJson);
+                //body.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
                 // if there are scripts, add them
                 if(fmScripts != null && fmScripts.Count > 0)
@@ -584,7 +600,7 @@ namespace FMdotNet__DataAPI
                 }
 
                 // doing a POST
-                var apiResponse = await webClient.PostAsync(url, body);
+                var apiResponse = await webClient.DeleteAsync(url);
                 string resultJson = await apiResponse.Content.ReadAsStringAsync();
                 Reply = JsonConvert.DeserializeObject<Received>(resultJson);
 
