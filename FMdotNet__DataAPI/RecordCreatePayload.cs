@@ -66,10 +66,12 @@ namespace FMdotNet__DataAPI
             List<string> portalNames = new List<string>();
 
             writer.WriteStartObject();
-            writer.WritePropertyName("fieldData");
-            writer.WriteStartObject();
+           
             if (fields != null && fields.Count > 0)
             {
+                writer.WritePropertyName("fieldData");
+                writer.WriteStartObject();
+
                 foreach (var item in fields)
                 {
                     // need to figure out if it is related or not
@@ -89,8 +91,10 @@ namespace FMdotNet__DataAPI
                         relatedFields.Add(item);
                     }
                 }
+
+                writer.WriteEndObject(); // for data / fieldData
             }
-            writer.WriteEndObject(); // for data / fieldData
+            
 
             // for 17+, add the portal data
             if(relatedFields != null && relatedFields.Count > 0)

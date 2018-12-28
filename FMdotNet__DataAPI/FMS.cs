@@ -88,6 +88,8 @@ namespace FMdotNet__DataAPI
         /// </summary>
         internal RecordCreateRequest createRequest { get; private set; }
 
+        internal RecordDuplicationRequest duplicateRquest { get; private set; }
+
         /// <summary>
         /// Class for all requests that modify existing records
         /// </summary>
@@ -381,6 +383,12 @@ namespace FMdotNet__DataAPI
         {
             editRequest = new RecordEditRequest(this,recId);
             return editRequest;
+        }
+
+        public RecordDuplicationRequest DuplicateRquest(int recId)
+        {
+            duplicateRquest = new RecordDuplicationRequest(this, recId);
+            return duplicateRquest;
         }
 
         /// <summary>

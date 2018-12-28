@@ -592,6 +592,56 @@ namespace FMdotNet__DataAPI
             }
         }
 
+        /// <summary>
+        /// Creates a request to duplicate a record.  Scripts can be added to the request.
+        /// </summary>
+        public class RecordDuplicationRequest : BaseRecordRequest
+        {
+            private int recId { get; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="RecordDuplicationRequest"/> class.
+            /// </summary>
+            /// <param name="fileMakerServer">The filemaker server.</param>
+            /// <param name="recordId">The record id to duplicate</param>
+            public RecordDuplicationRequest(FMS fileMakerServer, int recordId) : base(fileMakerServer)
+            {
+                recId = recordId;
+            }
+
+            /// <summary>
+            /// Executes the request.
+            /// </summary>
+            /// <returns>Received object.</returns>
+            public async Task<Received> Execute()
+            {
+                // create the payload, an empty {}
+                string payloadJson = string.Empty;
+
+                url = fms.BaseUrl + "databases/" + fms.CurrentDatabase + "/layouts/" + fms.CurrentLayout + "/records/" + recId;
+                
+
+                // if there are scripts, add them
+                if (fmScripts != null && fmScripts.Count > 0)
+                {
+                    RecordPayload payloadObject = new RecordPayload(fields, fms, fmScripts);
+
+                    payloadJson = payloadObject.ToJsonString();
+                }
+
+                // doing a POST
+                HttpContent body = new StringContent(payloadJson);
+                body.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                var apiResponse = await webClient.PostAsync(url, body);
+                string resultJson = await apiResponse.Content.ReadAsStringAsync();
+                Reply = JsonConvert.DeserializeObject<Received>(resultJson);
+
+                return Reply;
+            }
+        }
+
+
+
         /// <exclude />
         public class EmptyRecordCreateRequest : BaseRecordRequest
         {

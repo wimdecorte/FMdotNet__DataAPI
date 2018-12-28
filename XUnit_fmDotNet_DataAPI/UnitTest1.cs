@@ -381,5 +381,31 @@ namespace XUnit_fmDotNet_DataAPI
             // the mod id returned from the edit should be 1 because it was a new record and this was the first edit
             Assert.True((newModId == 1 && id > 0 && Convert.ToInt32(relatedId) > 0));
         }
+
+        [Fact]
+        public async Task TestDuplicateRecord()
+        {
+            var targetLayout = "cake_utility";
+            Login();
+            fms.SetLayout(targetLayout);
+
+            // first create a record and capture the ids
+            var request = fms.NewRecordRequest();
+            request.AddField("cake", RandomString(50, false));
+            var id = await request.Execute();
+
+            // now  duplicate that record
+            var duplicateRequest = fms.DuplicateRquest(id);
+            duplicateRequest.AddScript(ScriptTypes.after, "log", "some param");
+            var reply = await duplicateRequest.Execute();
+
+            var errorCode = Convert.ToInt32(reply.messages[0].code);
+            var newId = Convert.ToInt32(reply.Response.RecordId);
+
+            Logout();
+
+            // the mod id returned from the edit should be 1 because it was a new record and this was the first edit
+            Assert.True(newId == (id + 1) && errorCode == 0 && reply.Response.ScriptError == "0");
+        }
     }
 }
