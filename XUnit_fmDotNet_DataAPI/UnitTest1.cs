@@ -458,14 +458,44 @@ namespace XUnit_fmDotNet_DataAPI
         public async Task TestUploadToContainer()
         {
             var fileName = "WeeMee_13896756_for_wdecorte.jpg";
+            var full = @"../../../" + fileName;
             var targetLayout = "FRUIT_utility";
             Login();
             fms.SetLayout(targetLayout);
             var request = fms.NewRecordRequest();
-            request.AddField("cake", RandomString(50, false));
+            request.AddField("fruit", RandomString(5, false));
+            var id = await request.Execute();
 
+            // now upload to this new record
+            FileInfo fileToUpload = new FileInfo(full);
 
-            Assert.True(false);
+            int errorCode = await fms.UploadFileIntoContainerField(id, "container_field", fileToUpload);
+            
+            Assert.True(errorCode == 0);
+        }
+
+        [Fact]
+        public async Task TestUploadToContainerRepetition()
+        {
+            var fileName = "WeeMee_13896756_for_wdecorte.jpg";
+            var full = @"../../../" + fileName;
+            var targetLayout = "FRUIT_utility";
+
+            Login();
+            fms.SetLayout(targetLayout);
+
+            // create a new record first
+            var request = fms.NewRecordRequest();
+            request.AddField("fruit", RandomString(5, false));
+            var id = await request.Execute();
+
+            // now upload to this new record
+            FileInfo fileToUpload = new FileInfo(full);
+
+            // upload to 3rd rep
+            int errorCode = await fms.UploadFileIntoContainerField(id, "container_field_repeat",3, fileToUpload);
+
+            Assert.True(errorCode == 0);
         }
 
         [Fact]
@@ -526,6 +556,46 @@ namespace XUnit_fmDotNet_DataAPI
 
             Logout();
             return containerDataFile;
+        }
+
+        [Fact]
+        public async Task TestSetGlobals()
+        {
+            var targetLayout = "FRUIT_utility";
+
+            Login();
+
+            // need the layout not for setting the globals but for the find request to confirm that they were set
+            fms.SetLayout(targetLayout);
+
+            // directly for one global field
+            var valueText = "Hello World!";
+            var valueNumber = 9999;
+            var errorCodeSingle = await fms.SetSingleGlobalField("global_field_text", "FRUIT", valueText);
+
+            // or through multiple
+            List<Field> fields = new List<Field>();
+            fields.Add(new Field("global_field_number", "fruit", 1, valueNumber.ToString(), 18));
+            fields.Add(new Field("global_field_number_repeat", "fruit", 1, valueNumber.ToString(), 18));
+            fields.Add(new Field("global_field_number_repeat", "fruit", 2, valueNumber.ToString(), 18));
+            var errorCodeMulti = await fms.SetMultipleGlobalField(fields);
+
+            // get a random record back to confirm the values
+            var findRequest = fms.FindRequest(1);
+            var getFindResponse = await findRequest.Execute();
+
+            // check the values for the globals
+            var record = getFindResponse.data.foundSet.records.First();
+            var value1 = record.fieldsAndData["global_field_text"];
+            var value2 = record.fieldsAndData["global_field_number"];
+            var value3 = record.fieldsAndData["global_field_number_repeat(1)"];
+            var value4 = record.fieldsAndData["global_field_number_repeat(2)"];
+
+            Logout();
+
+            Assert.True(errorCodeMulti == 0 && errorCodeSingle == 0 && value1 == valueText &&
+                        value2 == valueNumber.ToString() && value3 == valueNumber.ToString() &&
+                        value4 == valueNumber.ToString());
         }
     }
 }

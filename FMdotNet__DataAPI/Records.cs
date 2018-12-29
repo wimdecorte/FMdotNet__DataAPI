@@ -242,13 +242,22 @@ namespace FMdotNet__DataAPI
             payloadJson.Add("globalFields", pairs);
 
 
-            StringContent body = new StringContent(payloadJson.ToString(), Encoding.UTF8, "application/json");
+            var client = new RestClient(url);
+            var request = new RestRequest(Method.PATCH);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("Authorization", "Bearer " + token);
+            request.AddParameter("undefined", payloadJson.ToString(Formatting.None), ParameterType.RequestBody);
+            IRestResponse apiResponse = client.Execute(request);
+            string resultJson = apiResponse.Content;
+
+            /*
+            StringContent body = new StringContent(payloadJson.ToString(Formatting.None), Encoding.UTF8, "application/json");
 
             HttpResponseMessage apiResponse = null;
             apiResponse = await PatchAsync(webClient, url, body);
 
             string resultJson = await apiResponse.Content.ReadAsStringAsync();
-
+            */
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -259,7 +268,7 @@ namespace FMdotNet__DataAPI
             {
                 // regular webclient / httpclient:
                 // SetLastError((int)apiResponse.StatusCode, apiResponse.ReasonPhrase);
-                SetLastError((int)apiResponse.StatusCode, apiResponse.ReasonPhrase);
+                SetLastError((int)apiResponse.StatusCode, apiResponse.ErrorMessage);
             }
 
             return lastErrorCode;
