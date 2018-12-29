@@ -3,6 +3,8 @@ using Xunit;
 using FMdotNet__DataAPI;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace XUnit_fmDotNet_DataAPI
@@ -427,7 +429,15 @@ namespace XUnit_fmDotNet_DataAPI
 
             // now  delete that record
             // direct command, no need to first get the request and then execute it
-            // doesn't allow to run scripts
+            // doesn't allow to run scripts unless you first construct them separately
+            /*
+            var script1 = new FMSscript(ScriptTypes.before, "log", "param");
+            var script2 = new FMSscript(ScriptTypes.after, "log", "param");
+            var scripts = new List<FMSscript>();
+            scripts.Add(script1);
+            scripts.Add(script2);
+            var deleteRecordResult = await fms.DeleteRecord(id,scripts);
+            */
             var deleteRecordResult = await fms.DeleteRecord(id);
             
 
@@ -442,6 +452,80 @@ namespace XUnit_fmDotNet_DataAPI
 
             // the mod id returned from the edit should be 1 because it was a new record and this was the first edit
             Assert.True(dupId == (id + 1) && deleteRecordResult == 0 && errorCode == 0 && reply.Response.ScriptError == "0");
+        }
+
+        [Fact]
+        public async Task TestUploadToContainer()
+        {
+            var fileName = "WeeMee_13896756_for_wdecorte.jpg";
+            var targetLayout = "FRUIT_utility";
+            Login();
+            fms.SetLayout(targetLayout);
+            var request = fms.NewRecordRequest();
+            request.AddField("cake", RandomString(50, false));
+
+
+            Assert.True(false);
+        }
+
+        [Fact]
+        public async Task TestGetContainerData()
+        {
+            var containerDataFile = await GetContainerDataFile();
+
+            Assert.True(containerDataFile.Exists);
+        }
+
+        [Fact]
+        public async Task TestGetContainerDataWithRepetition()
+        {
+            // make sure the target record has something in the 3rd rep
+            var containerDataFile = await GetContainerDataFile(10000, "container_field_repeat", 3);
+
+            Assert.True(containerDataFile.Exists);
+        }
+
+        private async Task<FileInfo> GetContainerDataFile()
+        {
+            return await GetContainerDataFile(10000, "container_field", 0);
+        }
+
+        private async Task<FileInfo> GetContainerDataFile(int recordId, string fieldName, int repetitionNumber)
+        {
+            int targetRecordId = recordId; // make sure this record has some data in the container field targeted!
+            string containerField = fieldName;
+            if (repetitionNumber > 0)
+            {
+                // append the repetition number, repeating fields look like this in the returned data
+                // container_field_repeat(3)": "https://..."
+                containerField = $"{containerField}({repetitionNumber})";
+            }
+
+            // what layout has a container field on it?
+            fms.SetLayout("FRUIT_utility");
+            fms.SetDownloadFolder(@"C:\Users\Public");
+            Login();
+
+            // find the record
+            var findMyRecord = fms.FindRequest(targetRecordId);
+            // execute the find
+            var myData = await findMyRecord.Execute();
+
+            // work with the result returned to get the URL of the container data
+            FMData result = myData.data;
+            FMRecordSet foundset = result.foundSet;
+            // there is only one record
+            FMRecord row = foundset.records.First();
+
+            // get the URL from the container field
+            string url = row.fieldsAndData[containerField];
+            
+            // get the container data to a file on disk
+            FileInfo containerDataFile =
+                await fms.DownloadFileFromContainerField(url, "test_" + RandomString(5, true) + ".jpg");
+
+            Logout();
+            return containerDataFile;
         }
     }
 }
