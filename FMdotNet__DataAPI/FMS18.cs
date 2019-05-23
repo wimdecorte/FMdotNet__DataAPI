@@ -68,6 +68,50 @@ namespace FMdotNet__DataAPI
         {
         }
 
+        public async Task<int> RunScript(string layout, string script, string param)
+        {
+            return await RunScript(this.CurrentDatabase, layout, script, param);
+        }
+
+        public async Task<int> RunScript(string script, string param)
+        {
+            return await RunScript(this.CurrentDatabase, this.CurrentLayout, script, param);
+        }
+
+        public async Task<int> RunScript(string script)
+        {
+            return await RunScript(this.CurrentDatabase, this.CurrentLayout, script, "");
+        }
+
+
+
+        public async Task<int> RunScript(string file, string layout, string script, string param)
+        {
+            ClearError();
+
+            var url = BaseUrl + "databases/" + file + "/layouts/" + layout + "/script/" + script + "?script.param=" + param;
+            SetAuthHeader();
+
+            try
+            {
+                HttpResponseMessage HttpResponse = null;
+
+                HttpResponse = await webClient.GetAsync(url);
+                var resultJson = await HttpResponse.Content.ReadAsStringAsync();
+                var r = JsonConvert.DeserializeObject<Received>(resultJson);
+
+                // we don't really care what the response was, just capture the error
+                SetFMSerror(r);
+            }
+            catch (Exception ex)
+            {
+                // set last error
+                SetUnexpectedError999(ex);
+            }
+
+            return this.lastErrorCode;
+        }
+
         public async Task<List<FileMakerFile>> GetFiles()
         {
             var url = BaseUrl + "databases";

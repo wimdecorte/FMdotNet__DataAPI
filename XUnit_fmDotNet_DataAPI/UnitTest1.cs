@@ -17,7 +17,7 @@ namespace XUnit_fmDotNet_DataAPI
         }
         string token;
 
-        static string address = "achttien.soliant.cloud";
+        static string address = "achttien.soliantdev.cloud";
         static string user = "rest";
         static string pw = "rest";
         string file = "the_UI";
@@ -596,6 +596,23 @@ namespace XUnit_fmDotNet_DataAPI
             Assert.True(errorCodeMulti == 0 && errorCodeSingle == 0 && value1 == valueText &&
                         value2 == valueNumber.ToString() && value3 == valueNumber.ToString() &&
                         value4 == valueNumber.ToString());
+        }
+
+        [Fact]
+        public async Task TestRunScript()
+        {
+            var targetLayout = "cake_utility";
+            var targetScript = "run_PSoS";
+            var targetParam = "5001";
+
+            Login();
+
+            // need the layout not for setting the globals but for the find request to confirm that they were set
+            fms.SetLayout(targetLayout);
+
+            var error = await fms.RunScript(targetScript, targetParam);
+
+            Assert.True(error == 0);
         }
     }
 }
