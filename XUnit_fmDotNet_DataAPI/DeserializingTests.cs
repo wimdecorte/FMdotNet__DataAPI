@@ -20,7 +20,7 @@ namespace XUnit_fmDotNet_DataAPI
 
             var response = JsonConvert.DeserializeObject<Received>(input);
 
-            Assert.True(response.Response.ResultSet.returnedCount == 100);
+            Assert.True(response.Response.DataInfo.returnedCount == 100);
         }
     }
 }

@@ -327,19 +327,21 @@ namespace FMdotNet__DataAPI
                 if (HttpResponse.StatusCode == HttpStatusCode.OK)
                 {
                     // instead of doing this, it would be better to deserialize --> but not ready yet to deal with the json in response property
-                    var productJson = jsonObject["response"];
+                    var productJson = jsonObject["response"]["productInfo"];
 
                     // product info is a json object as the value of the response key
                     // body will also contain an error code :
                     /*
                     {
                         "response": {
-                            "name": "FileMaker Data API Engine",
-                            "buildDate": "11/14/2018",
-                            "version": "18.0.1.69",
-                            "dateFormat": "MM/dd/yyyy",
-                            "timeFormat": "HH:mm:ss",
-                            "timeStampFormat": "MM/dd/yyyy HH:mm:ss"
+                            "productInfo": {
+                                "name": "FileMaker Data API Engine",
+                                "buildDate": "03/27/2019",
+                                "version": "18.0.1.109",
+                                "dateFormat": "MM/dd/yyyy",
+                                "timeFormat": "HH:mm:ss",
+                                "timeStampFormat": "MM/dd/yyyy HH:mm:ss"
+                            }
                         },
                         "messages": [
                     */

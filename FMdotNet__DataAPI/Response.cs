@@ -44,7 +44,7 @@ namespace FMdotNet__DataAPI
     public class Received : ReceivedMessages
     {
         /*
-        // needs a constructor to deal with the unknown json object that may be teh value of the response property/key
+        // needs a constructor to deal with the unknown json object that may be the value of the response property/key
         public Received(JObject response)
         {
 
@@ -89,11 +89,13 @@ namespace FMdotNet__DataAPI
 
         #endregion
 
-        [JsonProperty("dataSource")]
-        public DataSource DataSource { get; set; }
+        [JsonProperty("dataInfo")]
+        public DataInfo DataInfo { get; set; }
 
+        /*
         [JsonProperty("resultSet")]
         public ResultSet ResultSet { get; set; }
+        */
 
         [JsonProperty("recordId")]
         public string RecordId { get; set; }
@@ -140,11 +142,11 @@ namespace FMdotNet__DataAPI
         [JsonProperty("modId")]
         public string ModId { get; set; }
 
-        [JsonProperty("relatedSet")]
+        [JsonProperty("portalDataInfo")]
         /// <summary>
         /// for each portal and related record, the info on the TO and table of the related data, found count and returned count
         /// </summary>
-        public RelatedSet[] RelatedResultSet { get; set; }
+        public RelatedSet[] RelatedFoundSet { get; set; }
     }
 
     /// <summary>
@@ -219,12 +221,15 @@ namespace FMdotNet__DataAPI
     }
 
 
-    public class DataSource
+    public class DataInfo
     {
         public string database { get; set; }
         public string layout { get; set; }
         public string table { get; set; }
         public int totalRecordCount { get; set; }
+        public int returnedCount { get; set; }
+        public int foundCount { get; set; }
+
     }
 
 

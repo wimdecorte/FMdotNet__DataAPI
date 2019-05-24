@@ -144,7 +144,7 @@ namespace XUnit_fmDotNet_DataAPI
             Logout();
 
             // default search with no other criteria returns 100 records
-            Assert.True(getFindResponse.ErrorCode == 0 && getFindResponse.recordCount == 100);
+            Assert.True(getFindResponse.ErrorCode == 0 && getFindResponse.returnedRecordCount == 100);
         }
 
         [Fact]
@@ -178,7 +178,7 @@ namespace XUnit_fmDotNet_DataAPI
             Logout();
 
             // default search with no other criteria returns 100 records
-            Assert.True(getFindResponse.ErrorCode == 0 && getFindResponse.NumberOfRecords.foundCount > 0);
+            Assert.True(getFindResponse.ErrorCode == 0 && getFindResponse.SourceInfo.foundCount > 0);
         }
 
         [Fact]
@@ -216,7 +216,7 @@ namespace XUnit_fmDotNet_DataAPI
 
             // default search with no other criteria returns 100 records
             Assert.True(getFindResponse.ErrorCode == 0 &&
-                getFindResponse.NumberOfRecords.foundCount > 0 &&
+                getFindResponse.SourceInfo.foundCount > 0 &&
                 getFindResponse.ErrorCodeScriptBefore == 0 &&
                 getFindResponse.ErrorCodeScriptBeforeSort == 0 &&
                 getFindResponse.ErrorCodeScriptAfter == 0
@@ -240,7 +240,7 @@ namespace XUnit_fmDotNet_DataAPI
 
             // default search with no other criteria returns 100 records
             Assert.True(getFindResponse.ErrorCode == 0 &&
-                getFindResponse.NumberOfRecords.returnedCount == 1);
+                getFindResponse.SourceInfo.returnedCount == 1);
         }
 
         [Fact]
@@ -262,8 +262,8 @@ namespace XUnit_fmDotNet_DataAPI
 
             // default search with no other criteria returns 100 records
             Assert.True(getFindResponse.ErrorCode == 0 &&
-                getFindResponse.NumberOfRecords.returnedCount == 10 &&
-                getFindResponse.NumberOfRecords.foundCount > 0 &&
+                getFindResponse.SourceInfo.returnedCount == 10 &&
+                getFindResponse.SourceInfo.foundCount > 0 &&
                 getFindResponse.ErrorCodeScriptBefore == 0 &&
                 getFindResponse.ErrorCodeScriptBeforeSort == 0 );
         }
@@ -289,9 +289,9 @@ namespace XUnit_fmDotNet_DataAPI
 
             // default search with no other criteria returns 100 records
             Assert.True(getFindResponse.ErrorCode == 0 &&
-                getFindResponse.NumberOfRecords.returnedCount == 1 &&
+                getFindResponse.SourceInfo.returnedCount == 1 &&
                 getFindResponse.data.foundSet.records[0].recordId == "1" &&
-                getFindResponse.NumberOfRecords.foundCount == 1 &&
+                getFindResponse.SourceInfo.foundCount == 1 &&
                 getFindResponse.ErrorCodeScriptBefore == 0 &&
                 getFindResponse.ErrorCodeScriptBeforeSort == 0);
         }

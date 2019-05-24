@@ -37,24 +37,25 @@ namespace FMdotNet__DataAPI
         public string result { get;  private set; }
 
         /// <summary>
+        /// Total number of records in the table.
+        /// </summary>
+        public int totalRecordCount { get; private set; }
+
+        /// <summary>
+        /// The total record count in the found set.
+        /// </summary>
+        public int FoundRecordCount { get; private set; }
+
+        /// <summary>
         /// Total number of records returned in this result.
         /// </summary>
-        public int recordCount { get; private set; }
+        public int returnedRecordCount { get; private set; }
+
 
         /// <summary>
-        /// The total record count in the table.
+        /// FMS 18+, information about the context for the found set and the # of records
         /// </summary>
-        public int TotalFoundRecordCount { get; private set; }
-
-        /// <summary>
-        /// FMS 18+, contains the number of records in the returned set and the total found records
-        /// </summary>
-        public ResultSet NumberOfRecords { get; private set; }
-
-        /// <summary>
-        /// FMS 18+, information about the context for the found set
-        /// </summary>
-        public DataSource SourceInfo { get; private set; }
+        public DataInfo SourceInfo { get; private set; }
 
         
 
@@ -79,10 +80,11 @@ namespace FMdotNet__DataAPI
             ErrorCodeScriptBeforeSort = Convert.ToInt32(response.Response.ScriptErrorPreSort);
             ErrorCodeScriptAfter = Convert.ToInt32(response.Response.ScriptError);
 
-            NumberOfRecords = response.Response.ResultSet;
-            SourceInfo = response.Response.DataSource;
-
-            TotalFoundRecordCount = NumberOfRecords.foundCount;
+            
+            SourceInfo = response.Response.DataInfo;
+            FoundRecordCount = SourceInfo.foundCount;
+            totalRecordCount = SourceInfo.totalRecordCount;
+            returnedRecordCount = SourceInfo.returnedCount;
 
             ErrorCode = (int)json["messages"][0]["code"];
             result = (string)json["messages"][0]["message"];
@@ -190,7 +192,6 @@ namespace FMdotNet__DataAPI
                 // increment the record counter for the parent records
                 i++;
             }
-            recordCount = i ;
         }
 
         internal RecordsGetResponse(int errCode, string errMessage)
@@ -314,7 +315,7 @@ namespace FMdotNet__DataAPI
         {
             fieldsAndData = new Dictionary<string, string>();
             var deserialized = JsonConvert.DeserializeObject<Record>(recordJson);
-            RelatedSourceInfo = deserialized.RelatedResultSet;
+            RelatedSourceInfo = deserialized.RelatedFoundSet;
 
         }
 
