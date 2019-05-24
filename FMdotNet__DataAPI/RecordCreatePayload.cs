@@ -66,45 +66,38 @@ namespace FMdotNet__DataAPI
             List<string> portalNames = new List<string>();
 
             writer.WriteStartObject();
-            if(version == 16)
-                writer.WritePropertyName("data");
-            else if(version > 16)
-                writer.WritePropertyName("fieldData");
-            writer.WriteStartObject();
+           
             if (fields != null && fields.Count > 0)
             {
+                writer.WritePropertyName("fieldData");
+                writer.WriteStartObject();
+
                 foreach (var item in fields)
                 {
-                    if (version == 16)
+                    // need to figure out if it is related or not
+                    // and build a new list of just the related
+                    if (item.tableOccurance == string.Empty)
                     {
                         writer.WritePropertyName(item.fullName);
                         writer.WriteValue(item.fieldValue);
                     }
-                    else if (version > 16)
+                    else
                     {
-                        // need to figure out if it is related or not
-                        // and build a new list of just the related
-                        if (item.tableOccurance == string.Empty)
-                        {
-                            writer.WritePropertyName(item.fullName);
-                            writer.WriteValue(item.fieldValue);
-                        }
-                        else
-                        {
-                            if (item.portalObjectName != string.Empty && !portalNames.Contains(item.portalObjectName))
-                                portalNames.Add(item.portalObjectName);
-                            else if (!portalNames.Contains(item.tableOccurance))
-                                portalNames.Add(item.tableOccurance);
+                        if (item.portalObjectName != string.Empty && !portalNames.Contains(item.portalObjectName))
+                            portalNames.Add(item.portalObjectName);
+                        else if (!portalNames.Contains(item.tableOccurance))
+                            portalNames.Add(item.tableOccurance);
 
-                            relatedFields.Add(item);
-                        }
+                        relatedFields.Add(item);
                     }
                 }
+
+                writer.WriteEndObject(); // for data / fieldData
             }
-            writer.WriteEndObject(); // for data / fieldData
+            
 
             // for 17+, add the portal data
-            if(version > 16 && relatedFields != null && relatedFields.Count > 0)
+            if(relatedFields.Count > 0)
             {
                 writer.WritePropertyName("portalData");
                 writer.WriteStartObject();
@@ -141,7 +134,7 @@ namespace FMdotNet__DataAPI
                 writer.WritePropertyName("modId");
                 writer.WriteValue(modId);
             }
-            if(version > 16 && scripts != null && scripts.Count >= 1 )
+            if(scripts != null && scripts.Count >= 1 )
             {
                 foreach(FMSscript s in scripts)
                 {

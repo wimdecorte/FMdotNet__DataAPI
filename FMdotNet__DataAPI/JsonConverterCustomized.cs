@@ -16,11 +16,13 @@ namespace FMdotNet__DataAPI
         {
             List<KeyValuePair<string, string>> list = value as List<KeyValuePair<string, string>>;
             writer.WriteStartObject();
-            foreach( var item in list)
-            {
-                writer.WritePropertyName(item.Key);
-                writer.WriteValue(item.Value);
-            }
+            if (list != null)
+                foreach (var item in list)
+                {
+                    writer.WritePropertyName(item.Key);
+                    writer.WriteValue(item.Value);
+                }
+
             writer.WriteEndObject();
         }
         /// <exclude />
@@ -43,13 +45,15 @@ namespace FMdotNet__DataAPI
         {
             List<KeyValuePair<string, object>> list = value as List<KeyValuePair<string, object>>;
             writer.WriteStartObject();
-            foreach (var item in list)
-            {
-                writer.WritePropertyName(item.Key);
-                var jsonValue = JsonConvert.SerializeObject(item.Value);
-                writer.WriteValue(jsonValue);
-                writer.WriteValue(item.Value);
-            }
+            if (list != null)
+                foreach (var item in list)
+                {
+                    writer.WritePropertyName(item.Key);
+                    var jsonValue = JsonConvert.SerializeObject(item.Value);
+                    writer.WriteValue(jsonValue);
+                    writer.WriteValue(item.Value);
+                }
+
             writer.WriteEndObject();
         }
         /// <exclude />
