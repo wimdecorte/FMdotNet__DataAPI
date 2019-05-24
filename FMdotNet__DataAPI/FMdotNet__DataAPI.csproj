@@ -8,6 +8,7 @@
     <FileVersion>18.0.0.0</FileVersion>
     <DependsOnNETStandard>true</DependsOnNETStandard>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <PackageLicenseUrl>https://spdx.org/licenses/MIT.html</PackageLicenseUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
