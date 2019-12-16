@@ -12,7 +12,7 @@ The FileMaker Server 16 Data API has stopped working in September 2018, so all F
 
 The original fmDotNet was a wrapper around the FileMaker Server XML API and is still valid.  It is available here on GitHub and as a NuGet package. (https://github.com/fuzzzerd/fmDotNet)
 
-See this repo for a demo application: https://github.com/wimdecorte/fmDotNet__DataAPI_Demo_17 for FileMaker Server 17
+See this repo for a demo application: https://github.com/wimdecorte/fmDotNet__DataAPI_Demo_17 for FileMaker Server 17 and a special branch in that project for FileMaker Server 18.
 
 To Do:
 - This project started off as a PCL Library to maximize cross-platform compatibility.  Before releasing it here I've upgraded it to .NET Standard 2.0.  One of the things missing from PCL was System.Data.  Since those are available in .NET Standard 2.0 I am considering changing the return type of the custom FMData object to a native DataSet.
